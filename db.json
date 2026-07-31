@@ -1,0 +1,11 @@
+{
+  "users": {},
+  "messages_public": [],
+  "messages_private": {},
+  "presence": {},
+  "meta": {
+    "created": "2026-07-31",
+    "version": 3,
+    "description": "ChatHub backend storage - 跨设备聊天数据"
+  }
+}
