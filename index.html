@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ChatHub - 网页聊天平台</title>
+<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/gun.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/sea.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/lib/radix.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/lib/radisk.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/lib/store.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/lib/rindexed.js"></script>
 <style>
   :root {
     --primary: #6366f1;
@@ -77,527 +83,249 @@
     position: relative;
     z-index: 1;
   }
-  .auth-logo {
-    text-align: center;
-    margin-bottom: 30px;
-  }
+  .auth-logo { text-align: center; margin-bottom: 30px; }
   .auth-logo .logo-icon {
-    width: 64px;
-    height: 64px;
+    width: 64px; height: 64px;
     background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
     border-radius: 18px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    margin-bottom: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 32px; margin-bottom: 12px;
     box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
   }
   .auth-logo h1 {
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 28px; font-weight: 700;
     background: linear-gradient(135deg, #818cf8, #c4b5fd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
-  .auth-logo p {
-    color: var(--text-secondary);
-    font-size: 14px;
-    margin-top: 6px;
-  }
-  .form-group {
-    margin-bottom: 20px;
-  }
+  .auth-logo p { color: var(--text-secondary); font-size: 14px; margin-top: 6px; }
+  .form-group { margin-bottom: 20px; }
   .form-group label {
-    display: block;
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-    font-weight: 500;
+    display: block; font-size: 13px; color: var(--text-secondary);
+    margin-bottom: 6px; font-weight: 500;
   }
   .form-group input {
-    width: 100%;
-    padding: 12px 14px;
+    width: 100%; padding: 12px 14px;
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid var(--border);
     border-radius: 10px;
-    color: var(--text-primary);
-    font-size: 14px;
+    color: var(--text-primary); font-size: 14px;
     transition: all 0.2s;
   }
   .form-group input:focus {
-    outline: none;
-    border-color: var(--primary);
+    outline: none; border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
   }
-  .form-group input::placeholder {
-    color: var(--text-muted);
-  }
+  .form-group input::placeholder { color: var(--text-muted); }
   .btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+    width: 100%; padding: 12px; border: none; border-radius: 10px;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
   }
   .btn-primary {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: white;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    color: white; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
   }
-  .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
   .btn-primary:active { transform: translateY(0); }
-  .btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-  .auth-switch {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 14px;
-    color: var(--text-secondary);
-  }
-  .auth-switch a {
-    color: var(--primary-light);
-    text-decoration: none;
-    font-weight: 600;
-    cursor: pointer;
-  }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .auth-switch { text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-secondary); }
+  .auth-switch a { color: var(--primary-light); text-decoration: none; font-weight: 600; cursor: pointer; }
   .auth-switch a:hover { text-decoration: underline; }
+  .auth-error, .auth-success {
+    padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none;
+  }
   .auth-error {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #fca5a5;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    margin-bottom: 16px;
-    display: none;
+    background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5;
   }
-  .auth-error.show { display: block; }
+  .auth-error.show, .auth-success.show { display: block; }
   .auth-success {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    color: #6ee7b7;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    margin-bottom: 16px;
-    display: none;
+    background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7;
   }
-  .auth-success.show { display: block; }
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+    border-radius: 50%; animation: spin 0.6s linear infinite;
+    vertical-align: middle; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .conn-badge {
+    position: fixed; top: 12px; right: 12px;
+    background: rgba(30,41,59,0.9); border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 20px; font-size: 11px; z-index: 50;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warning); }
+  .conn-dot.online { background: var(--success); }
 
   /* ============ Chat Layout ============ */
-  .chat-app {
-    display: none;
-    height: 100vh;
-    grid-template-columns: 300px 1fr;
-  }
+  .chat-app { display: none; height: 100vh; grid-template-columns: 300px 1fr; }
   .chat-app.show { display: grid; }
-
-  /* Sidebar */
   .sidebar {
-    background: var(--bg-sidebar);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    background: var(--bg-sidebar); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
   }
   .sidebar-header {
-    padding: 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding: 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
   }
-  .sidebar-header .user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .sidebar-header .user-info { display: flex; align-items: center; gap: 10px; }
   .avatar {
-    width: 40px; height: 40px;
-    border-radius: 50%;
+    width: 40px; height: 40px; border-radius: 50%;
     background: linear-gradient(135deg, var(--primary), #8b5cf6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 600;
-    font-size: 16px;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 600; font-size: 16px; flex-shrink: 0;
   }
-  .user-info .user-name {
-    font-weight: 600;
-    font-size: 15px;
-  }
+  .user-info .user-name { font-weight: 600; font-size: 15px; }
   .user-info .user-status {
-    font-size: 12px;
-    color: var(--success);
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    font-size: 12px; color: var(--success);
+    display: flex; align-items: center; gap: 4px;
   }
   .user-status::before {
-    content: "";
-    width: 7px; height: 7px;
-    background: var(--success);
-    border-radius: 50%;
-    display: inline-block;
+    content: ""; width: 7px; height: 7px; background: var(--success);
+    border-radius: 50%; display: inline-block;
   }
   .icon-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
-    transition: all 0.2s;
-    font-size: 18px;
+    background: transparent; border: none; color: var(--text-secondary);
+    cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.2s; font-size: 18px;
   }
-  .icon-btn:hover {
-    background: rgba(148, 163, 184, 0.1);
-    color: var(--text-primary);
-  }
-  .sidebar-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-  }
+  .icon-btn:hover { background: rgba(148, 163, 184, 0.1); color: var(--text-primary); }
+  .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
   .sidebar-tab {
-    flex: 1;
-    padding: 12px;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    transition: all 0.2s;
-    border-bottom: 2px solid transparent;
+    flex: 1; padding: 12px; background: transparent; border: none;
+    color: var(--text-secondary); cursor: pointer; font-size: 13px; font-weight: 500;
+    transition: all 0.2s; border-bottom: 2px solid transparent;
   }
-  .sidebar-tab.active {
-    color: var(--primary-light);
-    border-bottom-color: var(--primary);
-  }
-  .sidebar-tab:hover:not(.active) {
-    background: rgba(148, 163, 184, 0.05);
-    color: var(--text-primary);
-  }
-  .sidebar-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-  }
+  .sidebar-tab.active { color: var(--primary-light); border-bottom-color: var(--primary); }
+  .sidebar-tab:hover:not(.active) { background: rgba(148, 163, 184, 0.05); color: var(--text-primary); }
+  .sidebar-list { flex: 1; overflow-y: auto; padding: 8px; }
   .sidebar-list::-webkit-scrollbar { width: 6px; }
-  .sidebar-list::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 3px;
-  }
+  .sidebar-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   .list-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.15s;
-    margin-bottom: 2px;
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+    border-radius: 10px; cursor: pointer; transition: background 0.15s; margin-bottom: 2px;
   }
-  .list-item:hover {
-    background: rgba(148, 163, 184, 0.08);
-  }
-  .list-item.active {
-    background: rgba(99, 102, 241, 0.15);
-  }
-  .list-item .item-content {
-    flex: 1;
-    min-width: 0;
-  }
+  .list-item:hover { background: rgba(148, 163, 184, 0.08); }
+  .list-item.active { background: rgba(99, 102, 241, 0.15); }
+  .list-item .item-content { flex: 1; min-width: 0; }
   .list-item .item-name {
-    font-size: 14px;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 14px; font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .list-item .item-last {
-    font-size: 12px;
-    color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 2px;
+    font-size: 12px; color: var(--text-muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;
   }
-  .list-item .item-time {
-    font-size: 11px;
-    color: var(--text-muted);
-    flex-shrink: 0;
-  }
+  .list-item .item-time { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
   .list-item .badge {
-    background: var(--primary);
-    color: white;
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 10px;
-    margin-left: 6px;
+    background: var(--primary); color: white; font-size: 11px;
+    padding: 2px 6px; border-radius: 10px; margin-left: 6px;
   }
-  .online-dot {
-    position: relative;
-  }
+  .online-dot { position: relative; }
   .online-dot::after {
-    content: "";
-    position: absolute;
-    bottom: 2px; right: 2px;
-    width: 10px; height: 10px;
-    background: var(--success);
-    border: 2px solid var(--bg-sidebar);
-    border-radius: 50%;
+    content: ""; position: absolute; bottom: 2px; right: 2px;
+    width: 10px; height: 10px; background: var(--success);
+    border: 2px solid var(--bg-sidebar); border-radius: 50%;
   }
-  .offline-dot::after {
-    background: var(--text-muted);
-  }
-  .empty-list {
-    text-align: center;
-    color: var(--text-muted);
-    padding: 40px 20px;
-    font-size: 13px;
-  }
+  .offline-dot::after { background: var(--text-muted); }
+  .empty-list { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 13px; }
 
   /* Chat Area */
-  .chat-area {
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-chat);
-    overflow: hidden;
-  }
+  .chat-area { display: flex; flex-direction: column; background: var(--bg-chat); overflow: hidden; }
   .chat-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--bg-sidebar);
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px; background: var(--bg-sidebar);
   }
-  .chat-header .chat-title {
-    font-weight: 600;
-    font-size: 16px;
-  }
-  .chat-header .chat-subtitle {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-  }
+  .chat-header .chat-title { font-weight: 600; font-size: 16px; }
+  .chat-header .chat-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
   .messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex: 1; overflow-y: auto; padding: 20px;
+    display: flex; flex-direction: column; gap: 8px;
   }
   .messages::-webkit-scrollbar { width: 6px; }
-  .messages::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 3px;
-  }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   .message {
-    display: flex;
-    gap: 10px;
-    max-width: 70%;
+    display: flex; gap: 10px; max-width: 70%;
     animation: fadeIn 0.2s ease;
   }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .message.self {
-    align-self: flex-end;
-    flex-direction: row-reverse;
-  }
-  .message .avatar {
-    width: 32px; height: 32px;
-    font-size: 13px;
-  }
-  .message-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+  .message.self { align-self: flex-end; flex-direction: row-reverse; }
+  .message .avatar { width: 32px; height: 32px; font-size: 13px; }
+  .message-content { display: flex; flex-direction: column; gap: 4px; }
   .message.self .message-content { align-items: flex-end; }
   .message-meta {
-    font-size: 11px;
-    color: var(--text-muted);
-    display: flex;
-    gap: 6px;
-    align-items: center;
+    font-size: 11px; color: var(--text-muted);
+    display: flex; gap: 6px; align-items: center;
   }
-  .message-meta .sender {
-    font-weight: 600;
-    color: var(--text-secondary);
-  }
+  .message-meta .sender { font-weight: 600; color: var(--text-secondary); }
   .message-bubble {
-    background: var(--bg-message-other);
-    padding: 10px 14px;
-    border-radius: 16px;
-    border-bottom-left-radius: 4px;
-    font-size: 14px;
-    line-height: 1.5;
-    word-break: break-word;
+    background: var(--bg-message-other); padding: 10px 14px;
+    border-radius: 16px; border-bottom-left-radius: 4px;
+    font-size: 14px; line-height: 1.5; word-break: break-word;
   }
   .message.self .message-bubble {
     background: var(--bg-message-self);
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 4px;
-    color: white;
+    border-bottom-left-radius: 16px; border-bottom-right-radius: 4px; color: white;
   }
   .message.system .message-bubble {
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 12px;
-    text-align: center;
-    margin: 0 auto;
-    font-style: italic;
+    background: transparent; color: var(--text-muted);
+    font-size: 12px; text-align: center; margin: 0 auto; font-style: italic;
   }
-  .message.system {
-    align-self: center;
-    max-width: 100%;
-  }
+  .message.system { align-self: center; max-width: 100%; }
   .message.system .message-meta { display: none; }
-
   .empty-chat {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    gap: 16px;
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; color: var(--text-muted); gap: 16px;
   }
-  .empty-chat .empty-icon {
-    font-size: 64px;
-    opacity: 0.4;
-  }
-  .empty-chat h3 {
-    font-size: 18px;
-    color: var(--text-secondary);
-  }
+  .empty-chat .empty-icon { font-size: 64px; opacity: 0.4; }
+  .empty-chat h3 { font-size: 18px; color: var(--text-secondary); }
 
   /* Input Area */
   .chat-input {
-    padding: 14px 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    background: var(--bg-sidebar);
+    padding: 14px 20px; border-top: 1px solid var(--border);
+    display: flex; gap: 10px; align-items: flex-end; background: var(--bg-sidebar);
   }
   .chat-input textarea {
-    flex: 1;
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px 14px;
-    color: var(--text-primary);
-    font-size: 14px;
-    font-family: inherit;
-    resize: none;
-    max-height: 120px;
-    min-height: 42px;
-    transition: border-color 0.2s;
+    flex: 1; background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 14px; color: var(--text-primary);
+    font-size: 14px; font-family: inherit; resize: none;
+    max-height: 120px; min-height: 42px; transition: border-color 0.2s;
   }
-  .chat-input textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-  }
+  .chat-input textarea:focus { outline: none; border-color: var(--primary); }
   .send-btn {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    border: none;
-    color: white;
-    width: 42px; height: 42px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+    border: none; color: white; width: 42px; height: 42px;
+    border-radius: 12px; cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
   }
   .send-btn:hover { transform: scale(1.05); }
-  .send-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* Modal */
   .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(4px);
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; backdrop-filter: blur(4px);
   }
   .modal-overlay.show { display: flex; }
   .modal {
-    background: var(--bg-sidebar);
-    border-radius: 16px;
-    padding: 24px;
-    width: 90%;
-    max-width: 360px;
-    box-shadow: var(--shadow);
+    background: var(--bg-sidebar); border-radius: 16px; padding: 24px;
+    width: 90%; max-width: 360px; box-shadow: var(--shadow);
   }
-  .modal h3 {
-    margin-bottom: 16px;
-    font-size: 18px;
-  }
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  .modal-actions .btn {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-  }
-  .btn-secondary {
-    background: var(--bg-input);
-    color: var(--text-primary);
-  }
-  .btn-danger {
-    background: var(--danger);
-    color: white;
-  }
+  .modal h3 { margin-bottom: 16px; font-size: 18px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-actions .btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; }
+  .btn-secondary { background: var(--bg-input); color: var(--text-primary); }
+  .btn-danger { background: var(--danger); color: white; }
 
   /* Toast */
   .toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--bg-sidebar);
-    border: 1px solid var(--border);
-    padding: 12px 18px;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    z-index: 200;
-    transform: translateX(400px);
-    transition: transform 0.3s ease;
-    font-size: 14px;
-    max-width: 320px;
+    position: fixed; top: 20px; right: 20px;
+    background: var(--bg-sidebar); border: 1px solid var(--border);
+    padding: 12px 18px; border-radius: 10px; box-shadow: var(--shadow);
+    z-index: 200; transform: translateX(400px); transition: transform 0.3s ease;
+    font-size: 14px; max-width: 320px;
   }
   .toast.show { transform: translateX(0); }
   .toast.success { border-color: var(--success); }
@@ -605,17 +333,11 @@
 
   /* Mobile responsive */
   @media (max-width: 768px) {
-    .chat-app {
-      grid-template-columns: 1fr;
-    }
+    .chat-app { grid-template-columns: 1fr; }
     .sidebar {
-      position: absolute;
-      top: 0; left: 0; bottom: 0;
-      width: 80%;
-      max-width: 300px;
-      z-index: 10;
-      transform: translateX(-100%);
-      transition: transform 0.3s;
+      position: absolute; top: 0; left: 0; bottom: 0;
+      width: 80%; max-width: 300px; z-index: 10;
+      transform: translateX(-100%); transition: transform 0.3s;
     }
     .sidebar.open { transform: translateX(0); }
     .menu-toggle { display: block !important; }
@@ -623,29 +345,14 @@
     .auth-card { padding: 28px 20px; }
   }
   .menu-toggle {
-    display: none;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 20px;
-    cursor: pointer;
-    padding: 6px;
+    display: none; background: transparent; border: none;
+    color: var(--text-secondary); font-size: 20px; cursor: pointer; padding: 6px;
   }
-  .backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 5;
-  }
+  .backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 5; }
   .backdrop.show { display: block; }
-
   .typing-indicator {
-    font-size: 12px;
-    color: var(--text-muted);
-    padding: 4px 8px;
-    font-style: italic;
-    display: none;
+    font-size: 12px; color: var(--text-muted);
+    padding: 4px 8px; font-style: italic; display: none;
   }
   .typing-indicator.show { display: block; }
 </style>
@@ -684,7 +391,7 @@
     <div class="auth-logo">
       <div class="logo-icon">💬</div>
       <h1>创建账号</h1>
-      <p>加入 ChatHub，开始聊天</p>
+      <p>加入 ChatHub，开始跨设备聊天</p>
     </div>
     <div id="registerError" class="auth-error"></div>
     <div id="registerSuccess" class="auth-success"></div>
@@ -715,7 +422,6 @@
 
 <!-- ============ Chat App ============ -->
 <div id="chatApp" class="chat-app">
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="user-info">
@@ -731,12 +437,9 @@
       <button class="sidebar-tab active" data-tab="chats" onclick="switchTab('chats')">聊天</button>
       <button class="sidebar-tab" data-tab="users" onclick="switchTab('users')">在线用户</button>
     </div>
-    <div class="sidebar-list" id="sidebarList">
-      <!-- 动态渲染 -->
-    </div>
+    <div class="sidebar-list" id="sidebarList"></div>
   </aside>
 
-  <!-- Chat Area -->
   <main class="chat-area">
     <div class="chat-header" id="chatHeader" style="display:none;">
       <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
@@ -777,31 +480,46 @@
   </div>
 </div>
 
+<!-- Connection Badge -->
+<div class="conn-badge" id="connBadge">
+  <span class="conn-dot" id="connDot"></span>
+  <span id="connText">连接中…</span>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
 /* ====================================================================
- * ChatHub - 完整网页聊天平台
- * 架构：纯前端 + localStorage + BroadcastChannel
- * 支持：注册/登录、公共聊天室、私聊、在线用户、实时消息
+ * ChatHub v2 - 跨设备网页聊天平台
+ * 架构：Gun.js (去中心化 P2P 数据库) + SEA (加密)
+ * 后端：公开 relay peer (relay.peer.ooo)，无需注册
+ * 支持：注册/登录、公共聊天室、私聊、在线用户、跨设备实时消息
  * ==================================================================== */
 
-const STORAGE_KEYS = {
-  USERS: 'chathub_users',
-  SESSION: 'chathub_session',
-  MESSAGES_PUBLIC: 'chathub_messages_public',
-  MESSAGES_PRIVATE: 'chathub_messages_private',
-  ONLINE_USERS: 'chathub_online_users',
-};
+// 多 relay 冗余配置，断线自动切换
+const RELAYS = [
+  'https://relay.peer.ooo/gun',
+  'https://gun-manhattan.herokuapp.com/gun',
+  'https://gun-relay-mlccl.ondigitalocean.app/gun',
+];
+
+let gun = null;
+let sea = null;
+let currentUser = null;            // { username, nickname, pub, epub, pair }
+let currentChat = { type: null, target: null };
+let currentTab = 'chats';
+let typingTimeout = null;
+let heartbeatInterval = null;
+let presenceCleanupInterval = null;
+let onlineUsers = {};              // { username: { nickname, pub, lastSeen } }
+let publicMessages = [];           // [{ id, sender, senderNickname, text, ts }]
+let privateConvs = {};             // { otherUser: [{...message}] }
+let renderedPublicIds = new Set(); // 已渲染过的公共消息 id，避免重复
+let renderedPrivateIds = new Set();
+let lastTypingSignal = 0;
 
 // ============ 工具函数 ============
-async function sha256(text) {
-  const buf = new TextEncoder().encode(text);
-  const hash = await crypto.subtle.digest('SHA-256', buf);
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
 function getInitials(name) {
   if (!name) return '?';
   return name.charAt(0).toUpperCase();
@@ -817,8 +535,9 @@ function formatTime(ts) {
 }
 
 function escapeHtml(str) {
+  if (str == null) return '';
   const div = document.createElement('div');
-  div.textContent = str;
+  div.textContent = String(str);
   return div.innerHTML;
 }
 
@@ -829,158 +548,387 @@ function showToast(message, type = '') {
   setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
-// ============ 数据访问层 ============
-const DB = {
-  getUsers() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '{}'); }
-    catch { return {}; }
-  },
-  saveUsers(users) {
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-  },
-  getUser(username) {
-    const users = this.getUsers();
-    return users[username.toLowerCase()];
-  },
-  addUser(user) {
-    const users = this.getUsers();
-    users[user.username.toLowerCase()] = user;
-    this.saveUsers(users);
-  },
-  setSession(username) {
-    localStorage.setItem(STORAGE_KEYS.SESSION, username);
-  },
-  getSession() {
-    return localStorage.getItem(STORAGE_KEYS.SESSION);
-  },
-  clearSession() {
-    localStorage.removeItem(STORAGE_KEYS.SESSION);
-  },
-  getPublicMessages() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.MESSAGES_PUBLIC) || '[]'); }
-    catch { return []; }
-  },
-  savePublicMessages(msgs) {
-    // 只保留最近200条
-    if (msgs.length > 200) msgs = msgs.slice(-200);
-    localStorage.setItem(STORAGE_KEYS.MESSAGES_PUBLIC, JSON.stringify(msgs));
-  },
-  getPrivateMessages() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.MESSAGES_PRIVATE) || '{}'); }
-    catch { return {}; }
-  },
-  savePrivateMessages(data) {
-    localStorage.setItem(STORAGE_KEYS.MESSAGES_PRIVATE, JSON.stringify(data));
-  },
-  getPrivateConversation(userA, userB) {
-    const key = [userA, userB].sort().join('|');
-    const all = this.getPrivateMessages();
-    return all[key] || [];
-  },
-  addPrivateMessage(userA, userB, msg) {
-    const key = [userA, userB].sort().join('|');
-    const all = this.getPrivateMessages();
-    if (!all[key]) all[key] = [];
-    all[key].push(msg);
-    if (all[key].length > 200) all[key] = all[key].slice(-200);
-    this.savePrivateMessages(all);
-  },
-  getOnlineUsers() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.ONLINE_USERS) || '{}'); }
-    catch { return {}; }
-  },
-  setOnlineUser(username, nickname) {
-    const users = this.getOnlineUsers();
-    users[username] = { nickname, lastSeen: Date.now() };
-    localStorage.setItem(STORAGE_KEYS.ONLINE_USERS, JSON.stringify(users));
-    bc && bc.postMessage({ type: 'presence', user: username, nickname, online: true });
-  },
-  removeOnlineUser(username) {
-    const users = this.getOnlineUsers();
-    delete users[username];
-    localStorage.setItem(STORAGE_KEYS.ONLINE_USERS, JSON.stringify(users));
-    bc && bc.postMessage({ type: 'presence', user: username, online: false });
-  },
-  heartbeat() {
-    if (!currentUser) return;
-    this.setOnlineUser(currentUser.username, currentUser.nickname);
-  },
-  cleanupStaleUsers() {
-    const users = this.getOnlineUsers();
-    const now = Date.now();
-    const cleaned = {};
-    let changed = false;
-    for (const [u, info] of Object.entries(users)) {
-      if (now - info.lastSeen < 30000) { // 30秒超时
-        cleaned[u] = info;
-      } else { changed = true; }
-    }
-    if (changed) {
-      localStorage.setItem(STORAGE_KEYS.ONLINE_USERS, JSON.stringify(cleaned));
-    }
-  },
-};
-
-// ============ 跨标签页通信 ============
-let bc = null;
-let currentUser = null;
-let currentChat = { type: null, target: null }; // type: 'public' | 'private'
-let currentTab = 'chats';
-let typingTimeout = null;
-let heartbeatInterval = null;
-
-function initBroadcastChannel() {
-  if (bc) bc.close();
-  bc = new BroadcastChannel('chathub');
-  bc.onmessage = (e) => {
-    const msg = e.data;
-    if (!msg) return;
-    if (msg.type === 'chat' && msg.message) {
-      // 收到新消息
-      if (msg.message.recipient) {
-        // 私聊消息
-        const otherUser = msg.message.sender === currentUser.username ? msg.message.recipient : msg.message.sender;
-        DB.addPrivateMessage(msg.message.sender, msg.message.recipient, msg.message);
-        if (currentChat.type === 'private' && currentChat.target === otherUser) {
-          renderMessages();
-        } else {
-          showToast(`${msg.message.senderNickname} 给你发了一条私信`);
-        }
-      } else {
-        // 公共消息
-        const msgs = DB.getPublicMessages();
-        msgs.push(msg.message);
-        DB.savePublicMessages(msgs);
-        if (currentChat.type === 'public') {
-          renderMessages();
-        } else {
-          showToast(`${msg.message.senderNickname}: ${msg.message.text.substring(0, 30)}`);
-        }
-      }
-    } else if (msg.type === 'presence') {
-      // 在线状态变化
-      DB.cleanupStaleUsers();
-      if (currentTab === 'users') renderSidebarList();
-      updateChatHeaderStatus();
-    } else if (msg.type === 'typing') {
-      // 正在输入提示
-      if (currentChat.type === 'private' && currentChat.target === msg.user) {
-        const ind = document.getElementById('typingIndicator');
-        if (msg.typing) {
-          ind.textContent = `${msg.nickname} 正在输入...`;
-          ind.classList.add('show');
-        } else {
-          ind.classList.remove('show');
-        }
-      }
-    } else if (msg.type === 'user_registered') {
-      // 新用户注册
-      if (currentTab === 'users') renderSidebarList();
-    }
-  };
+function setConnStatus(online, text) {
+  const dot = document.getElementById('connDot');
+  const txt = document.getElementById('connText');
+  dot.classList.toggle('online', !!online);
+  txt.textContent = text || (online ? '已连接' : '连接中…');
 }
 
-// ============ 认证系统 ============
+// 用 SEA 加密 password 作为"密码哈希"——不存原密码
+async function hashPassword(password) {
+  // 用 password 加密一个固定字符串，得到稳定哈希
+  const enc = await SEA.encrypt('chathub-v1', password);
+  return enc;
+}
+
+async function verifyPassword(password, hash) {
+  try {
+    const dec = await SEA.decrypt(hash, password);
+    return dec === 'chathub-v1';
+  } catch { return false; }
+}
+
+// ============ Gun 初始化 ============
+function initGun() {
+  if (gun) return;
+  gun = Gun({
+    peers: RELAYS,
+    localStorage: 'chathub-local',   // 本地缓存
+    radisk: true,
+  });
+  sea = SEA;
+
+  // 连接状态监听
+  const mesh = gun.back('opt.mesh') || {};
+  let anyConn = false;
+  // 任何节点出现/消失时更新徽标
+  setInterval(() => {
+    const peers = gun.back('opt.peers') || {};
+    const alive = Object.values(peers).some(p => p && p.wire && p.wire.readyState === 1);
+    setConnStatus(alive, alive ? '已连接' : '连接中…');
+  }, 2000);
+}
+
+// ============ 注册系统（基于 SEA）============
+async function handleRegister(e) {
+  e.preventDefault();
+  const btn = document.getElementById('registerBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>注册中…';
+
+  const username = document.getElementById('regUsername').value.trim();
+  const nickname = document.getElementById('regNickname').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+  document.getElementById('registerError').classList.remove('show');
+  document.getElementById('registerSuccess').classList.remove('show');
+
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+    showAuthError('registerError', '用户名需为3-20位字母、数字或下划线');
+    btn.disabled = false; btn.textContent = '注 册'; return;
+  }
+  if (!nickname) {
+    showAuthError('registerError', '请输入昵称');
+    btn.disabled = false; btn.textContent = '注 册'; return;
+  }
+  if (password.length < 6) {
+    showAuthError('registerError', '密码至少6位');
+    btn.disabled = false; btn.textContent = '注 册'; return;
+  }
+  if (password !== passwordConfirm) {
+    showAuthError('registerError', '两次输入的密码不一致');
+    btn.disabled = false; btn.textContent = '注 册'; return;
+  }
+
+  initGun();
+
+  // 1. 检查用户名是否已存在
+  const existing = await new Promise(resolve => {
+    gun.get('chathub').get('users').get(username.toLowerCase()).once(v => resolve(v), {wait: 1500});
+  });
+
+  if (existing && existing.passwordHash) {
+    showAuthError('registerError', '该用户名已被注册');
+    btn.disabled = false; btn.textContent = '注 册'; return;
+  }
+
+  // 2. 创建 SEA 密钥对
+  const pair = await SEA.pair();
+  const passwordHash = await hashPassword(password);
+
+  const userRecord = {
+    username,
+    nickname,
+    passwordHash,
+    pub: pair.pub,
+    epub: pair.epub,
+    createdAt: Date.now(),
+  };
+
+  // 3. 写入 Gun 图数据库
+  gun.get('chathub').get('users').get(username.toLowerCase()).put(userRecord);
+
+  const successEl = document.getElementById('registerSuccess');
+  successEl.textContent = `注册成功！欢迎，${nickname}。正在跳转登录…`;
+  successEl.classList.add('show');
+
+  setTimeout(() => {
+    document.getElementById('registerForm').reset();
+    document.getElementById('loginUsername').value = username;
+    showLogin();
+    btn.disabled = false;
+    btn.textContent = '注 册';
+  }, 1500);
+}
+
+// ============ 登录系统 ============
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>登录中…';
+
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  document.getElementById('loginError').classList.remove('show');
+  initGun();
+
+  // 1. 读取用户记录
+  const userRecord = await new Promise(resolve => {
+    let done = false;
+    gun.get('chathub').get('users').get(username.toLowerCase()).once(v => {
+      if (!done) { done = true; resolve(v); }
+    }, {wait: 2500});
+    setTimeout(() => { if (!done) { done = true; resolve(null); } }, 3000);
+  });
+
+  if (!userRecord || !userRecord.passwordHash) {
+    showAuthError('loginError', '用户名不存在，请先注册');
+    btn.disabled = false; btn.textContent = '登 录'; return;
+  }
+
+  // 2. 校验密码
+  const ok = await verifyPassword(password, userRecord.passwordHash);
+  if (!ok) {
+    showAuthError('loginError', '密码错误');
+    btn.disabled = false; btn.textContent = '登 录'; return;
+  }
+
+  // 3. 恢复 SEA 密钥对（基于用户名+密码）
+  // 由于我们不存储 priv/epriv，需要重新派生——但 SEA 的 pair 是随机生成的
+  // 所以我们存储了 pub/epub，但 priv/epriv 需要"密码+salt"派生
+  // 简化处理：注册时也存一份 pair 在加密形式（用 password 加密）
+  // 这里我们直接拿存储的 pub/epub 用于身份，私聊加密用 senderNickname 即可
+  // 真正严格的端到端加密需要派生 pair，但为了演示可用性，我们简化为不加密私聊内容
+  // 若需要 E2EE，可在注册时存储 password 加密的 pair，登录时解出
+
+  currentUser = {
+    username: userRecord.username,
+    nickname: userRecord.nickname,
+    pub: userRecord.pub,
+    epub: userRecord.epub,
+  };
+
+  // 4. 持久化会话（localStorage 仅存登录态，不含密钥）
+  localStorage.setItem('chathub_session', JSON.stringify({
+    username: currentUser.username,
+    nickname: currentUser.nickname,
+    pub: currentUser.pub,
+    epub: currentUser.epub,
+    ts: Date.now(),
+  }));
+
+  // 5. 上线广播 + 进入聊天
+  announcePresence(true);
+  enterChatApp();
+  startListening();
+  startHeartbeat();
+
+  btn.disabled = false;
+  btn.textContent = '登 录';
+}
+
+// ============ 在线状态 ============
+function announcePresence(online) {
+  if (!currentUser || !gun) return;
+  const info = {
+    username: currentUser.username,
+    nickname: currentUser.nickname,
+    pub: currentUser.pub,
+    lastSeen: Date.now(),
+    online: !!online,
+  };
+  // 写到 presence 节点
+  gun.get('chathub').get('presence').get(currentUser.username).put(info);
+  // 在线用户列表由全局监听器更新
+}
+
+function startHeartbeat() {
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  heartbeatInterval = setInterval(() => {
+    announcePresence(true);
+  }, 15000);
+
+  if (presenceCleanupInterval) clearInterval(presenceCleanupInterval);
+  presenceCleanupInterval = setInterval(() => {
+    cleanupStalePresence();
+  }, 10000);
+}
+
+function cleanupStalePresence() {
+  const now = Date.now();
+  let changed = false;
+  for (const [u, info] of Object.entries(onlineUsers)) {
+    if (now - info.lastSeen > 30000) {
+      delete onlineUsers[u];
+      changed = true;
+    }
+  }
+  if (changed) {
+    if (currentTab === 'users') renderSidebarList();
+    updateChatHeaderStatus();
+  }
+}
+
+// ============ 监听 Gun 实时数据 ============
+function startListening() {
+  // 1. 监听所有在线用户（presence 节点）
+  gun.get('chathub').get('presence').map().on((data, key) => {
+    if (!data || !data.username) return;
+    onlineUsers[data.username] = {
+      username: data.username,
+      nickname: data.nickname,
+      pub: data.pub,
+      lastSeen: data.lastSeen || Date.now(),
+      online: data.online,
+    };
+    // 自动更新 UI
+    if (currentTab === 'users') renderSidebarList();
+    updateChatHeaderStatus();
+  });
+
+  // 2. 监听公共聊天消息
+  gun.get('chathub').get('public_chat').map().on((data, key) => {
+    if (!data || !data.id || renderedPublicIds.has(data.id)) return;
+    renderedPublicIds.add(data.id);
+    // 按时间戳排序插入
+    publicMessages.push(data);
+    publicMessages.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+    if (currentChat.type === 'public') {
+      renderMessages();
+      renderSidebarList();
+    } else {
+      showToast(`${data.senderNickname || data.sender}: ${data.text.substring(0, 30)}`);
+      renderSidebarList();
+    }
+  });
+
+  // 3. 监听私聊消息——基于双方 pub 组合的 channel key
+  // channel key = 两个 username 的有序拼接
+  // 我们监听所有涉及当前用户的私聊频道
+  // 由于无法预先知道谁会私信我们，监听 'chathub/private/<myUser>' 的 map
+  gun.get('chathub').get('private').get(currentUser.username).map().on((data, key) => {
+    if (!data || !data.id) return;
+    const convKey = data.conversationKey;
+    if (!convKey) return;
+    const otherUser = data.sender === currentUser.username ? data.recipient : data.sender;
+    if (!privateConvs[otherUser]) privateConvs[otherUser] = [];
+    const convId = `${convKey}:${data.id}`;
+    if (renderedPrivateIds.has(convId)) return;
+    renderedPrivateIds.add(convId);
+    privateConvs[otherUser].push(data);
+    privateConvs[otherUser].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+
+    if (currentChat.type === 'private' && currentChat.target === otherUser) {
+      renderMessages();
+      renderSidebarList();
+    } else {
+      // 仅在对方发的消息时提示
+      if (data.sender !== currentUser.username) {
+        showToast(`${data.senderNickname || data.sender} 给你发了一条私信`);
+      }
+      renderSidebarList();
+    }
+  });
+
+  // 4. 监听正在输入信号
+  gun.get('chathub').get('typing').map().on((data, key) => {
+    if (!data || !data.user) return;
+    if (currentChat.type === 'private' && currentChat.target === data.user) {
+      const ind = document.getElementById('typingIndicator');
+      if (data.typing && data.user !== currentUser.username) {
+        ind.textContent = `${data.nickname || data.user} 正在输入…`;
+        ind.classList.add('show');
+      } else {
+        ind.classList.remove('show');
+      }
+    }
+  });
+}
+
+// ============ 发送消息 ============
+function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const message = {
+    id: 'm' + Date.now() + Math.random().toString(36).slice(2, 6),
+    sender: currentUser.username,
+    senderNickname: currentUser.nickname,
+    text,
+    ts: Date.now(),
+  };
+
+  if (currentChat.type === 'public') {
+    // 写入公共聊天节点
+    gun.get('chathub').get('public_chat').get(message.id).put(message);
+    // 本地立即显示（监听会触发，但这里也手动加一下避免延迟）
+    renderedPublicIds.add(message.id);
+    publicMessages.push(message);
+    publicMessages.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+    renderMessages();
+  } else if (currentChat.type === 'private') {
+    const otherUser = currentChat.target;
+    const conversationKey = [currentUser.username, otherUser].sort().join('|');
+    message.recipient = otherUser;
+    message.conversationKey = conversationKey;
+    // 写入 sender 视角节点 & recipient 视角节点（双方都能监听到）
+    gun.get('chathub').get('private').get(currentUser.username).get(message.id).put(message);
+    gun.get('chathub').get('private').get(otherUser).get(message.id).put(message);
+    // 本地立即显示
+    const convId = `${conversationKey}:${message.id}`;
+    renderedPrivateIds.add(convId);
+    if (!privateConvs[otherUser]) privateConvs[otherUser] = [];
+    privateConvs[otherUser].push(message);
+    privateConvs[otherUser].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+    renderMessages();
+  }
+
+  input.value = '';
+  autoResize(input);
+  renderSidebarList();
+}
+
+// ============ 正在输入信号 ============
+function handleTyping() {
+  if (currentChat.type !== 'private') return;
+  const now = Date.now();
+  if (now - lastTypingSignal < 1500) return;  // 节流
+  lastTypingSignal = now;
+  gun.get('chathub').get('typing').get(currentUser.username).put({
+    user: currentUser.username,
+    nickname: currentUser.nickname,
+    typing: true,
+    ts: now,
+  });
+  if (typingTimeout) clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    gun.get('chathub').get('typing').get(currentUser.username).put({
+      user: currentUser.username,
+      nickname: currentUser.nickname,
+      typing: false,
+      ts: Date.now(),
+    });
+  }, 2000);
+}
+
+// ============ UI 渲染 ============
+function enterChatApp() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('registerPage').style.display = 'none';
+  document.getElementById('chatApp').classList.add('show');
+
+  document.getElementById('myNickname').textContent = currentUser.nickname;
+  document.getElementById('myAvatar').textContent = getInitials(currentUser.nickname);
+
+  renderSidebarList();
+  openPublicChat();
+}
+
 function showRegister() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('registerPage').style.display = 'flex';
@@ -1000,162 +948,6 @@ function showAuthError(elId, msg) {
   el.classList.add('show');
 }
 
-async function handleRegister(e) {
-  e.preventDefault();
-  const btn = document.getElementById('registerBtn');
-  btn.disabled = true;
-  btn.textContent = '注册中...';
-
-  const username = document.getElementById('regUsername').value.trim();
-  const nickname = document.getElementById('regNickname').value.trim();
-  const password = document.getElementById('regPassword').value;
-  const passwordConfirm = document.getElementById('regPasswordConfirm').value;
-
-  document.getElementById('registerError').classList.remove('show');
-  document.getElementById('registerSuccess').classList.remove('show');
-
-  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
-    showAuthError('registerError', '用户名需为3-20位字母、数字或下划线');
-    btn.disabled = false; btn.textContent = '注 册';
-    return;
-  }
-  if (!nickname) {
-    showAuthError('registerError', '请输入昵称');
-    btn.disabled = false; btn.textContent = '注 册';
-    return;
-  }
-  if (password.length < 6) {
-    showAuthError('registerError', '密码至少6位');
-    btn.disabled = false; btn.textContent = '注 册';
-    return;
-  }
-  if (password !== passwordConfirm) {
-    showAuthError('registerError', '两次输入的密码不一致');
-    btn.disabled = false; btn.textContent = '注 册';
-    return;
-  }
-  if (DB.getUser(username)) {
-    showAuthError('registerError', '该用户名已被注册');
-    btn.disabled = false; btn.textContent = '注 册';
-    return;
-  }
-
-  const passwordHash = await sha256(password);
-  const user = {
-    username,
-    nickname,
-    passwordHash,
-    createdAt: Date.now(),
-  };
-  DB.addUser(user);
-
-  const successEl = document.getElementById('registerSuccess');
-  successEl.textContent = `注册成功！欢迎，${nickname}。正在跳转登录...`;
-  successEl.classList.add('show');
-
-  // 广播新用户注册
-  if (bc) bc.postMessage({ type: 'user_registered', username, nickname });
-
-  setTimeout(() => {
-    document.getElementById('registerForm').reset();
-    // 自动填充用户名方便登录
-    document.getElementById('loginUsername').value = username;
-    showLogin();
-    btn.disabled = false;
-    btn.textContent = '注 册';
-  }, 1500);
-}
-
-async function handleLogin(e) {
-  e.preventDefault();
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  btn.textContent = '登录中...';
-
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-
-  document.getElementById('loginError').classList.remove('show');
-
-  const user = DB.getUser(username);
-  if (!user) {
-    showAuthError('loginError', '用户名不存在，请先注册');
-    btn.disabled = false; btn.textContent = '登 录';
-    return;
-  }
-  const passwordHash = await sha256(password);
-  if (user.passwordHash !== passwordHash) {
-    showAuthError('loginError', '密码错误');
-    btn.disabled = false; btn.textContent = '登 录';
-    return;
-  }
-
-  // 登录成功
-  currentUser = { username: user.username, nickname: user.nickname };
-  DB.setSession(user.username);
-  initBroadcastChannel();
-  DB.setOnlineUser(user.username, user.nickname);
-
-  enterChatApp();
-  btn.disabled = false;
-  btn.textContent = '登 录';
-}
-
-function enterChatApp() {
-  document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('registerPage').style.display = 'none';
-  document.getElementById('chatApp').classList.add('show');
-
-  document.getElementById('myNickname').textContent = currentUser.nickname;
-  document.getElementById('myAvatar').textContent = getInitials(currentUser.nickname);
-
-  renderSidebarList();
-  openPublicChat();
-
-  // 启动心跳
-  if (heartbeatInterval) clearInterval(heartbeatInterval);
-  heartbeatInterval = setInterval(() => {
-    DB.heartbeat();
-    DB.cleanupStaleUsers();
-    if (currentTab === 'users') renderSidebarList();
-    updateChatHeaderStatus();
-  }, 15000);
-}
-
-function confirmLogout() {
-  document.getElementById('logoutModal').classList.add('show');
-}
-
-function closeLogoutModal() {
-  document.getElementById('logoutModal').classList.remove('show');
-}
-
-function logout() {
-  DB.removeOnlineUser(currentUser.username);
-  DB.clearSession();
-  currentUser = null;
-  currentChat = { type: null, target: null };
-  if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
-  if (bc) { bc.close(); bc = null; }
-  closeLogoutModal();
-  document.getElementById('chatApp').classList.remove('show');
-  document.getElementById('loginForm').reset();
-  document.getElementById('loginPage').style.display = 'flex';
-}
-
-// 自动恢复会话
-function restoreSession() {
-  const username = DB.getSession();
-  if (!username) return;
-  const user = DB.getUser(username);
-  if (!user) { DB.clearSession(); return; }
-  currentUser = { username: user.username, nickname: user.nickname };
-  initBroadcastChannel();
-  DB.setOnlineUser(user.username, user.nickname);
-  enterChatApp();
-}
-
-// ============ 聊天系统 ============
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.sidebar-tab').forEach(t => {
@@ -1173,8 +965,7 @@ function renderSidebarList() {
     const publicItem = document.createElement('div');
     publicItem.className = 'list-item' + (currentChat.type === 'public' ? ' active' : '');
     publicItem.onclick = () => openPublicChat();
-    const pubMsgs = DB.getPublicMessages();
-    const lastMsg = pubMsgs[pubMsgs.length - 1];
+    const lastMsg = publicMessages[publicMessages.length - 1];
     publicItem.innerHTML = `
       <div class="avatar" style="background: linear-gradient(135deg, #10b981, #059669);">#</div>
       <div class="item-content">
@@ -1185,26 +976,19 @@ function renderSidebarList() {
     `;
     list.appendChild(publicItem);
 
-    // 私聊会话列表（基于已有消息的用户）
-    const privateMsgs = DB.getPrivateMessages();
-    const privateUsers = new Set();
-    for (const key of Object.keys(privateMsgs)) {
-      const [a, b] = key.split('|');
-      if (a === currentUser.username) privateUsers.add(b);
-      else if (b === currentUser.username) privateUsers.add(a);
-    }
-
-    if (privateUsers.size === 0) {
+    // 私聊会话列表
+    const privateUsers = Object.keys(privateConvs).filter(u => privateConvs[u].length > 0);
+    if (privateUsers.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-list';
       empty.textContent = '还没有私聊，点击「在线用户」开始私聊';
       list.appendChild(empty);
     } else {
       for (const otherUser of privateUsers) {
-        const userObj = DB.getUser(otherUser);
-        const nickname = userObj ? userObj.nickname : otherUser;
-        const msgs = DB.getPrivateConversation(currentUser.username, otherUser);
+        const msgs = privateConvs[otherUser] || [];
         const lastPriv = msgs[msgs.length - 1];
+        const onlineInfo = onlineUsers[otherUser];
+        const nickname = (onlineInfo && onlineInfo.nickname) || (msgs[0] && msgs[0].senderNickname) || otherUser;
         const isActive = currentChat.type === 'private' && currentChat.target === otherUser;
         const item = document.createElement('div');
         item.className = 'list-item' + (isActive ? ' active' : '');
@@ -1221,11 +1005,8 @@ function renderSidebarList() {
       }
     }
   } else if (currentTab === 'users') {
-    // 在线用户列表
-    DB.cleanupStaleUsers();
-    const online = DB.getOnlineUsers();
-    const others = Object.entries(online).filter(([u]) => u !== currentUser.username);
-
+    cleanupStalePresence();
+    const others = Object.values(onlineUsers).filter(u => u.username !== currentUser.username);
     if (others.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-list';
@@ -1233,11 +1014,10 @@ function renderSidebarList() {
       list.appendChild(empty);
       return;
     }
-
-    for (const [username, info] of others) {
+    for (const info of others) {
       const item = document.createElement('div');
       item.className = 'list-item';
-      item.onclick = () => openPrivateChat(username);
+      item.onclick = () => openPrivateChat(info.username);
       item.innerHTML = `
         <div class="avatar online-dot">${getInitials(info.nickname)}</div>
         <div class="item-content">
@@ -1259,20 +1039,19 @@ function openPublicChat() {
   document.getElementById('chatAvatar').style.display = 'none';
 
   document.getElementById('chatTitle').textContent = '公共聊天室';
-  const online = DB.getOnlineUsers();
-  const count = Object.keys(online).length;
+  const count = Object.keys(onlineUsers).length;
   document.getElementById('chatSubtitle').textContent = `${count} 人在线`;
 
   renderSidebarList();
   renderMessages();
-  // 移动端关闭侧栏
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('backdrop').classList.remove('show');
 }
 
 function openPrivateChat(targetUser) {
-  const userObj = DB.getUser(targetUser);
-  const nickname = userObj ? userObj.nickname : targetUser;
+  const info = onlineUsers[targetUser];
+  const lastMsg = privateConvs[targetUser] && privateConvs[targetUser][0];
+  const nickname = (info && info.nickname) || (lastMsg && lastMsg.senderNickname) || targetUser;
   currentChat = { type: 'private', target: targetUser };
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('messagesContainer').style.display = 'flex';
@@ -1295,9 +1074,9 @@ function openPrivateChat(targetUser) {
 
 function updateChatHeaderStatus() {
   if (currentChat.type !== 'private') return;
-  const online = DB.getOnlineUsers();
-  const isOnline = !!online[currentChat.target];
-  const userObj = DB.getUser(currentChat.target);
+  const info = onlineUsers[currentChat.target];
+  const isOnline = !!info;
+  const userObj = onlineUsers[currentChat.target];
   const nickname = userObj ? userObj.nickname : currentChat.target;
   document.getElementById('chatSubtitle').textContent = isOnline ? '在线' : '离线';
   document.getElementById('chatSubtitle').style.color = isOnline ? 'var(--success)' : 'var(--text-muted)';
@@ -1309,9 +1088,9 @@ function renderMessages() {
 
   let messages;
   if (currentChat.type === 'public') {
-    messages = DB.getPublicMessages();
+    messages = publicMessages;
   } else if (currentChat.type === 'private') {
-    messages = DB.getPrivateConversation(currentUser.username, currentChat.target);
+    messages = privateConvs[currentChat.target] || [];
   } else {
     return;
   }
@@ -1332,8 +1111,8 @@ function renderMessages() {
     if (msg.system) {
       msgEl.innerHTML = `<div class="message-bubble">${escapeHtml(msg.text)}</div>`;
     } else {
-      const senderUser = DB.getUser(msg.sender);
-      const senderNickname = senderUser ? senderUser.nickname : msg.senderNickname || msg.sender;
+      const info = onlineUsers[msg.sender];
+      const senderNickname = (info && info.nickname) || msg.senderNickname || msg.sender;
       msgEl.innerHTML = `
         <div class="avatar">${getInitials(senderNickname)}</div>
         <div class="message-content">
@@ -1348,70 +1127,72 @@ function renderMessages() {
     container.appendChild(msgEl);
   }
 
-  // 滚到底部
   requestAnimationFrame(() => {
     container.scrollTop = container.scrollHeight;
   });
 }
 
-function sendMessage() {
-  const input = document.getElementById('messageInput');
-  const text = input.value.trim();
-  if (!text) return;
-
-  const message = {
-    id: Date.now() + '-' + Math.random().toString(36).slice(2, 8),
-    sender: currentUser.username,
-    senderNickname: currentUser.nickname,
-    text,
-    ts: Date.now(),
-  };
-
-  if (currentChat.type === 'public') {
-    const msgs = DB.getPublicMessages();
-    msgs.push(message);
-    DB.savePublicMessages(msgs);
-    // 广播给其他标签页
-    bc.postMessage({ type: 'chat', message });
-  } else if (currentChat.type === 'private') {
-    message.recipient = currentChat.target;
-    DB.addPrivateMessage(currentUser.username, currentChat.target, message);
-    bc.postMessage({ type: 'chat', message });
+// ============ 登出 ============
+function confirmLogout() {
+  document.getElementById('logoutModal').classList.add('show');
+}
+function closeLogoutModal() {
+  document.getElementById('logoutModal').classList.remove('show');
+}
+function logout() {
+  if (currentUser && gun) {
+    // 标记下线
+    gun.get('chathub').get('presence').get(currentUser.username).put({
+      username: currentUser.username,
+      nickname: currentUser.nickname,
+      lastSeen: Date.now(),
+      online: false,
+    });
   }
-
-  input.value = '';
-  autoResize(input);
-  renderMessages();
-  renderSidebarList();
+  localStorage.removeItem('chathub_session');
+  currentUser = null;
+  currentChat = { type: null, target: null };
+  onlineUsers = {};
+  publicMessages = [];
+  privateConvs = {};
+  renderedPublicIds.clear();
+  renderedPrivateIds.clear();
+  if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
+  if (presenceCleanupInterval) { clearInterval(presenceCleanupInterval); presenceCleanupInterval = null; }
+  closeLogoutModal();
+  document.getElementById('chatApp').classList.remove('show');
+  document.getElementById('loginForm').reset();
+  document.getElementById('loginPage').style.display = 'flex';
 }
 
+// ============ 自动恢复会话 ============
+function restoreSession() {
+  const raw = localStorage.getItem('chathub_session');
+  if (!raw) return;
+  try {
+    const sess = JSON.parse(raw);
+    if (!sess.username) { localStorage.removeItem('chathub_session'); return; }
+    initGun();
+    currentUser = {
+      username: sess.username,
+      nickname: sess.nickname,
+      pub: sess.pub,
+      epub: sess.epub,
+    };
+    announcePresence(true);
+    enterChatApp();
+    startListening();
+    startHeartbeat();
+  } catch {
+    localStorage.removeItem('chathub_session');
+  }
+}
+
+// ============ 辅助函数 ============
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
-
-function handleTyping() {
-  if (currentChat.type !== 'private') return;
-  if (!bc) return;
-
-  if (typingTimeout) clearTimeout(typingTimeout);
-  bc.postMessage({
-    type: 'typing',
-    user: currentUser.username,
-    nickname: currentUser.nickname,
-    typing: true,
-  });
-  typingTimeout = setTimeout(() => {
-    bc.postMessage({
-      type: 'typing',
-      user: currentUser.username,
-      nickname: currentUser.nickname,
-      typing: false,
-    });
-  }, 2000);
-}
-
-// ============ 移动端 ============
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('backdrop').classList.toggle('show');
@@ -1431,19 +1212,18 @@ messageInput.addEventListener('keydown', (e) => {
   }
 });
 
-// 页面卸载时清除在线状态
 window.addEventListener('beforeunload', () => {
-  if (currentUser && bc) {
-    DB.removeOnlineUser(currentUser.username);
+  if (currentUser && gun) {
+    gun.get('chathub').get('presence').get(currentUser.username).put({
+      username: currentUser.username,
+      nickname: currentUser.nickname,
+      lastSeen: Date.now(),
+      online: false,
+    });
   }
 });
 
-// 定期清理过期用户（标签页关闭未清理的情况）
-setInterval(() => {
-  DB.cleanupStaleUsers();
-}, 30000);
-
-// 启动时恢复会话
+// 启动
 restoreSession();
 </script>
 </body>
