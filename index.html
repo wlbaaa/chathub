@@ -762,8 +762,9 @@ function cleanupStalePresence() {
   const now = Date.now();
   let changed = false;
   for (const [u, info] of Object.entries(onlineUsers)) {
-    if (now - info.lastSeen > 30000) {
-      delete onlineUsers[u];
+    if (u === currentUser.username) continue;  // 自己永远算在线
+    if (now - info.lastSeen > 30000 && info.online) {
+      info.online = false;
       changed = true;
     }
   }
@@ -776,25 +777,66 @@ function cleanupStalePresence() {
 // ============ 监听 Gun 实时数据 ============
 function startListening() {
   // 1. 监听所有在线用户（presence 节点）
-  gun.get('chathub').get('presence').map().on((data, key) => {
+  // 用 .once() 先加载所有历史 presence 数据，再 .on() 监听新增/更新
+  gun.get('chathub').get('presence').map().once((data, key) => {
     if (!data || !data.username) return;
+    const isSelf = data.username === currentUser.username;
     onlineUsers[data.username] = {
       username: data.username,
       nickname: data.nickname,
       pub: data.pub,
       lastSeen: data.lastSeen || Date.now(),
-      online: data.online,
+      online: isSelf ? true : data.online,
+    };
+  });
+  // 然后监听实时更新
+  gun.get('chathub').get('presence').map().on((data, key) => {
+    if (!data || !data.username) return;
+    const isSelf = data.username === currentUser.username;
+    onlineUsers[data.username] = {
+      username: data.username,
+      nickname: data.nickname,
+      pub: data.pub,
+      lastSeen: data.lastSeen || Date.now(),
+      online: isSelf ? true : data.online,
     };
     // 自动更新 UI
     if (currentTab === 'users') renderSidebarList();
     updateChatHeaderStatus();
   });
+  // 给 .once() 一点时间，然后刷新一次 UI
+  setTimeout(() => {
+    cleanupStalePresence();
+    if (currentTab === 'users') renderSidebarList();
+    updateChatHeaderStatus();
+  }, 3000);
+  // 定期重新扫描（防止遗漏）
+  setInterval(() => {
+    gun.get('chathub').get('presence').map().once((data, key) => {
+      if (!data || !data.username) return;
+      const isSelf = data.username === currentUser.username;
+      if (!onlineUsers[data.username] || (Date.now() - (onlineUsers[data.username].lastSeen || 0) < 60000 && !onlineUsers[data.username].online)) {
+        onlineUsers[data.username] = {
+          username: data.username,
+          nickname: data.nickname,
+          pub: data.pub,
+          lastSeen: data.lastSeen || Date.now(),
+          online: isSelf ? true : data.online,
+        };
+      }
+    });
+  }, 20000);
 
-  // 2. 监听公共聊天消息
+  // 2. 监听公共聊天消息——用 .once() 加载历史，.on() 接收新消息
+  gun.get('chathub').get('public_chat').map().once((data, key) => {
+    if (!data || !data.id || renderedPublicIds.has(data.id)) return;
+    renderedPublicIds.add(data.id);
+    publicMessages.push(data);
+    publicMessages.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  });
   gun.get('chathub').get('public_chat').map().on((data, key) => {
     if (!data || !data.id || renderedPublicIds.has(data.id)) return;
     renderedPublicIds.add(data.id);
-    // 按时间戳排序插入
     publicMessages.push(data);
     publicMessages.sort((a, b) => (a.ts || 0) - (b.ts || 0));
     if (currentChat.type === 'public') {
@@ -805,11 +847,26 @@ function startListening() {
       renderSidebarList();
     }
   });
+  // 给历史加载留时间，然后刷新 UI
+  setTimeout(() => {
+    if (currentChat.type === 'public') renderMessages();
+    renderSidebarList();
+  }, 3000);
 
-  // 3. 监听私聊消息——基于双方 pub 组合的 channel key
-  // channel key = 两个 username 的有序拼接
-  // 我们监听所有涉及当前用户的私聊频道
-  // 由于无法预先知道谁会私信我们，监听 'chathub/private/<myUser>' 的 map
+  // 3. 监听私聊消息
+  // 用 .once() 加载历史 + .on() 接收新消息
+  gun.get('chathub').get('private').get(currentUser.username).map().once((data, key) => {
+    if (!data || !data.id) return;
+    const convKey = data.conversationKey;
+    if (!convKey) return;
+    const otherUser = data.sender === currentUser.username ? data.recipient : data.sender;
+    if (!privateConvs[otherUser]) privateConvs[otherUser] = [];
+    const convId = `${convKey}:${data.id}`;
+    if (renderedPrivateIds.has(convId)) return;
+    renderedPrivateIds.add(convId);
+    privateConvs[otherUser].push(data);
+    privateConvs[otherUser].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  });
   gun.get('chathub').get('private').get(currentUser.username).map().on((data, key) => {
     if (!data || !data.id) return;
     const convKey = data.conversationKey;
@@ -826,13 +883,16 @@ function startListening() {
       renderMessages();
       renderSidebarList();
     } else {
-      // 仅在对方发的消息时提示
       if (data.sender !== currentUser.username) {
         showToast(`${data.senderNickname || data.sender} 给你发了一条私信`);
       }
       renderSidebarList();
     }
   });
+  setTimeout(() => {
+    if (currentChat.type === 'private') renderMessages();
+    renderSidebarList();
+  }, 3000);
 
   // 4. 监听正在输入信号
   gun.get('chathub').get('typing').map().on((data, key) => {
@@ -1006,7 +1066,7 @@ function renderSidebarList() {
     }
   } else if (currentTab === 'users') {
     cleanupStalePresence();
-    const others = Object.values(onlineUsers).filter(u => u.username !== currentUser.username);
+    const others = Object.values(onlineUsers).filter(u => u.username !== currentUser.username && u.online !== false && (Date.now() - (u.lastSeen || 0) < 60000));
     if (others.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-list';
