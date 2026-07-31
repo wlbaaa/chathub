@@ -9,7 +9,14 @@
   },
   "messages_public": [],
   "messages_private": {},
-  "presence": {},
+  "presence": {
+    "alice": {
+      "username": "alice",
+      "nickname": "Alice",
+      "lastSeen": 1785501900538,
+      "online": true
+    }
+  },
   "meta": {
     "created": "2026-07-31",
     "version": 3,
