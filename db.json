@@ -1,30 +1,8 @@
 {
-  "users": {
-    "alice": {
-      "username": "alice",
-      "nickname": "Alice",
-      "passwordHash": "bd94dcda26fccb4e68d6a31f9b5aac0b571ae266d822620e901ef7ebe3a11d4f",
-      "createdAt": 1785501897576
-    }
-  },
-  "messages_public": [
-    {
-      "id": "m1785501906120",
-      "sender": "alice",
-      "senderNickname": "Alice",
-      "text": "Hello from backend simulation!",
-      "ts": 1785501906120
-    }
-  ],
+  "users": {},
+  "messages_public": [],
   "messages_private": {},
-  "presence": {
-    "alice": {
-      "username": "alice",
-      "nickname": "Alice",
-      "lastSeen": 1785501900538,
-      "online": true
-    }
-  },
+  "presence": {},
   "meta": {
     "created": "2026-07-31",
     "version": 3,
