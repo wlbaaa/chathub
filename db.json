@@ -7,7 +7,15 @@
       "createdAt": 1785501897576
     }
   },
-  "messages_public": [],
+  "messages_public": [
+    {
+      "id": "m1785501906120",
+      "sender": "alice",
+      "senderNickname": "Alice",
+      "text": "Hello from backend simulation!",
+      "ts": 1785501906120
+    }
+  ],
   "messages_private": {},
   "presence": {
     "alice": {
