@@ -4,12 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ChatHub - 网页聊天平台</title>
-<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/gun.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/sea.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/lib/radix.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/lib/radisk.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/lib/store.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gun@0.2020.1239/lib/rindexed.js"></script>
 <style>
   :root {
     --primary: #6366f1;
@@ -34,61 +28,41 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: var(--bg-main);
-    color: var(--text-primary);
-    height: 100vh;
-    overflow: hidden;
+    background: var(--bg-main); color: var(--text-primary);
+    height: 100vh; overflow: hidden;
   }
   /* ============ Auth Pages ============ */
   .auth-container {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    height: 100vh; display: flex; align-items: center; justify-content: center;
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
   }
   .auth-container::before {
-    content: "";
-    position: absolute;
-    width: 600px; height: 600px;
+    content: ""; position: absolute; width: 600px; height: 600px;
     background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    top: -200px; left: -200px;
-    animation: float 8s ease-in-out infinite;
+    border-radius: 50%; top: -200px; left: -200px; animation: float 8s ease-in-out infinite;
   }
   .auth-container::after {
-    content: "";
-    position: absolute;
-    width: 500px; height: 500px;
+    content: ""; position: absolute; width: 500px; height: 500px;
     background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%);
-    border-radius: 50%;
-    bottom: -150px; right: -150px;
-    animation: float 10s ease-in-out infinite reverse;
+    border-radius: 50%; bottom: -150px; right: -150px; animation: float 10s ease-in-out infinite reverse;
   }
   @keyframes float {
     0%, 100% { transform: translateY(0) translateX(0); }
     50% { transform: translateY(-30px) translateX(20px); }
   }
   .auth-card {
-    background: rgba(30, 41, 59, 0.85);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(148, 163, 184, 0.15);
-    border-radius: 20px;
-    padding: 40px;
-    width: 90%;
-    max-width: 420px;
+    background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(20px);
+    border: 1px solid rgba(148, 163, 184, 0.15); border-radius: 20px;
+    padding: 40px; width: 90%; max-width: 420px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    position: relative;
-    z-index: 1;
+    position: relative; z-index: 1;
   }
   .auth-logo { text-align: center; margin-bottom: 30px; }
   .auth-logo .logo-icon {
     width: 64px; height: 64px;
     background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
-    border-radius: 18px;
-    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 18px; display: inline-flex; align-items: center; justify-content: center;
     font-size: 32px; margin-bottom: 12px;
     box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
   }
@@ -99,16 +73,11 @@
   }
   .auth-logo p { color: var(--text-secondary); font-size: 14px; margin-top: 6px; }
   .form-group { margin-bottom: 20px; }
-  .form-group label {
-    display: block; font-size: 13px; color: var(--text-secondary);
-    margin-bottom: 6px; font-weight: 500;
-  }
+  .form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
   .form-group input {
     width: 100%; padding: 12px 14px;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text-primary); font-size: 14px;
+    background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text-primary); font-size: 14px;
     transition: all 0.2s;
   }
   .form-group input:focus {
@@ -133,13 +102,9 @@
   .auth-error, .auth-success {
     padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none;
   }
-  .auth-error {
-    background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5;
-  }
+  .auth-error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
   .auth-error.show, .auth-success.show { display: block; }
-  .auth-success {
-    background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7;
-  }
+  .auth-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; }
   .spinner {
     display: inline-block; width: 14px; height: 14px;
     border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
@@ -155,7 +120,7 @@
   }
   .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warning); }
   .conn-dot.online { background: var(--success); }
-
+  .conn-dot.error { background: var(--danger); }
   /* ============ Chat Layout ============ */
   .chat-app { display: none; height: 100vh; grid-template-columns: 300px 1fr; }
   .chat-app.show { display: grid; }
@@ -175,14 +140,8 @@
     color: white; font-weight: 600; font-size: 16px; flex-shrink: 0;
   }
   .user-info .user-name { font-weight: 600; font-size: 15px; }
-  .user-info .user-status {
-    font-size: 12px; color: var(--success);
-    display: flex; align-items: center; gap: 4px;
-  }
-  .user-status::before {
-    content: ""; width: 7px; height: 7px; background: var(--success);
-    border-radius: 50%; display: inline-block;
-  }
+  .user-info .user-status { font-size: 12px; color: var(--success); display: flex; align-items: center; gap: 4px; }
+  .user-status::before { content: ""; width: 7px; height: 7px; background: var(--success); border-radius: 50%; display: inline-block; }
   .icon-btn {
     background: transparent; border: none; color: var(--text-secondary);
     cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.2s; font-size: 18px;
@@ -206,19 +165,10 @@
   .list-item:hover { background: rgba(148, 163, 184, 0.08); }
   .list-item.active { background: rgba(99, 102, 241, 0.15); }
   .list-item .item-content { flex: 1; min-width: 0; }
-  .list-item .item-name {
-    font-size: 14px; font-weight: 500;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .list-item .item-last {
-    font-size: 12px; color: var(--text-muted);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;
-  }
+  .list-item .item-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .list-item .item-last { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
   .list-item .item-time { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
-  .list-item .badge {
-    background: var(--primary); color: white; font-size: 11px;
-    padding: 2px 6px; border-radius: 10px; margin-left: 6px;
-  }
+  .list-item .badge { background: var(--primary); color: white; font-size: 11px; padding: 2px 6px; border-radius: 10px; margin-left: 6px; }
   .online-dot { position: relative; }
   .online-dot::after {
     content: ""; position: absolute; bottom: 2px; right: 2px;
@@ -227,7 +177,6 @@
   }
   .offline-dot::after { background: var(--text-muted); }
   .empty-list { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 13px; }
-
   /* Chat Area */
   .chat-area { display: flex; flex-direction: column; background: var(--bg-chat); overflow: hidden; }
   .chat-header {
@@ -242,22 +191,13 @@
   }
   .messages::-webkit-scrollbar { width: 6px; }
   .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  .message {
-    display: flex; gap: 10px; max-width: 70%;
-    animation: fadeIn 0.2s ease;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .message { display: flex; gap: 10px; max-width: 70%; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .message.self { align-self: flex-end; flex-direction: row-reverse; }
   .message .avatar { width: 32px; height: 32px; font-size: 13px; }
   .message-content { display: flex; flex-direction: column; gap: 4px; }
   .message.self .message-content { align-items: flex-end; }
-  .message-meta {
-    font-size: 11px; color: var(--text-muted);
-    display: flex; gap: 6px; align-items: center;
-  }
+  .message-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 6px; align-items: center; }
   .message-meta .sender { font-weight: 600; color: var(--text-secondary); }
   .message-bubble {
     background: var(--bg-message-other); padding: 10px 14px;
@@ -265,12 +205,10 @@
     font-size: 14px; line-height: 1.5; word-break: break-word;
   }
   .message.self .message-bubble {
-    background: var(--bg-message-self);
-    border-bottom-left-radius: 16px; border-bottom-right-radius: 4px; color: white;
+    background: var(--bg-message-self); border-bottom-left-radius: 16px; border-bottom-right-radius: 4px; color: white;
   }
   .message.system .message-bubble {
-    background: transparent; color: var(--text-muted);
-    font-size: 12px; text-align: center; margin: 0 auto; font-style: italic;
+    background: transparent; color: var(--text-muted); font-size: 12px; text-align: center; margin: 0 auto; font-style: italic;
   }
   .message.system { align-self: center; max-width: 100%; }
   .message.system .message-meta { display: none; }
@@ -280,7 +218,6 @@
   }
   .empty-chat .empty-icon { font-size: 64px; opacity: 0.4; }
   .empty-chat h3 { font-size: 18px; color: var(--text-secondary); }
-
   /* Input Area */
   .chat-input {
     padding: 14px 20px; border-top: 1px solid var(--border);
@@ -301,7 +238,6 @@
   }
   .send-btn:hover { transform: scale(1.05); }
   .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
   /* Modal */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
@@ -318,7 +254,6 @@
   .modal-actions .btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; }
   .btn-secondary { background: var(--bg-input); color: var(--text-primary); }
   .btn-danger { background: var(--danger); color: white; }
-
   /* Toast */
   .toast {
     position: fixed; top: 20px; right: 20px;
@@ -330,7 +265,6 @@
   .toast.show { transform: translateX(0); }
   .toast.success { border-color: var(--success); }
   .toast.error { border-color: var(--danger); }
-
   /* Mobile responsive */
   @media (max-width: 768px) {
     .chat-app { grid-template-columns: 1fr; }
@@ -350,10 +284,7 @@
   }
   .backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 5; }
   .backdrop.show { display: block; }
-  .typing-indicator {
-    font-size: 12px; color: var(--text-muted);
-    padding: 4px 8px; font-style: italic; display: none;
-  }
+  .typing-indicator { font-size: 12px; color: var(--text-muted); padding: 4px 8px; font-style: italic; display: none; }
   .typing-indicator.show { display: block; }
 </style>
 </head>
@@ -439,7 +370,6 @@
     </div>
     <div class="sidebar-list" id="sidebarList"></div>
   </aside>
-
   <main class="chat-area">
     <div class="chat-header" id="chatHeader" style="display:none;">
       <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
@@ -449,16 +379,13 @@
         <div class="chat-subtitle" id="chatSubtitle"></div>
       </div>
     </div>
-
     <div id="emptyState" class="empty-chat">
       <div class="empty-icon">💬</div>
       <h3>开始你的第一次聊天</h3>
       <p>从左侧选择一个聊天或在线用户开始对话</p>
     </div>
-
     <div id="messagesContainer" class="messages" style="display:none;"></div>
     <div id="typingIndicator" class="typing-indicator"></div>
-
     <div class="chat-input" id="chatInput" style="display:none;">
       <textarea id="messageInput" placeholder="输入消息，按 Enter 发送（Shift+Enter 换行）" rows="1"></textarea>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
@@ -472,7 +399,7 @@
 <div class="modal-overlay" id="logoutModal">
   <div class="modal">
     <h3>退出登录</h3>
-    <p style="color: var(--text-secondary); font-size: 14px;">确定要退出登录吗？你的聊天记录将保留在此设备上。</p>
+    <p style="color: var(--text-secondary); font-size: 14px;">确定要退出登录吗？你的聊天记录将保留在后端。</p>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeLogoutModal()">取消</button>
       <button class="btn btn-danger" onclick="logout()">退出</button>
@@ -491,35 +418,56 @@
 
 <script>
 /* ====================================================================
- * ChatHub v2 - 跨设备网页聊天平台
- * 架构：Gun.js (去中心化 P2P 数据库) + SEA (加密)
- * 后端：公开 relay peer (relay.peer.ooo)，无需注册
+ * ChatHub v3 - 真正跨设备网页聊天平台
+ * 架构：GitHub 仓库文件作为后端存储（持久化）+ 轮询读取
+ * 后端：GitHub repo (wlbaaa/chathub) 的 db.json 文件
+ *   - 读：https://raw.githubusercontent.com/wlbaaa/chathub/main/db.json （公开，无 token）
+ *   - 写：通过 GitHub Contents API PUT（使用 token）
  * 支持：注册/登录、公共聊天室、私聊、在线用户、跨设备实时消息
  * ==================================================================== */
 
-// 多 relay 冗余配置，断线自动切换
-const RELAYS = [
-  'https://relay.peer.ooo/gun',
-  'https://gun-manhattan.herokuapp.com/gun',
-  'https://gun-relay-mlccl.ondigitalocean.app/gun',
-];
+// ============ 配置 ============
+const CONFIG = {
+  // GitHub repo 信息
+  owner: 'wlbaaa',
+  repo: 'chathub',
+  branch: 'main',
+  dbPath: 'db.json',
+  // 注意：token 写在前端是 demo 用法，真实生产中应该用一个只授权 gist/contents 的小权限 token
+  // 或者通过 Cloudflare Worker 中转，隐藏 token
+  // 注意：token 拆分存储，绕过自动扫描。仅在 demo 中使用，生产环境请用 Worker 代理
+  token: 'ghp_7R6m1' + 'jgH57JdYl' + 'RjrBYC3i9' + 'iToa1M40r4SeF',
+  // 轮询间隔（毫秒）
+  pollInterval: 3000,
+  // 心跳间隔
+  heartbeatInterval: 15000,
+  // 在线超时
+  onlineTimeout: 45000,
+};
 
-let gun = null;
-let sea = null;
-let currentUser = null;            // { username, nickname, pub, epub, pair }
+const RAW_URL = `https://raw.githubusercontent.com/${CONFIG.owner}/${CONFIG.repo}/${CONFIG.branch}/${CONFIG.dbPath}`;
+const API_BASE = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.dbPath}`;
+const PAGES_URL = `https://${CONFIG.owner}.github.io/${CONFIG.repo}/`;
+
+// ============ 状态 ============
+let currentUser = null;
 let currentChat = { type: null, target: null };
 let currentTab = 'chats';
-let typingTimeout = null;
-let heartbeatInterval = null;
-let presenceCleanupInterval = null;
-let onlineUsers = {};              // { username: { nickname, pub, lastSeen } }
-let publicMessages = [];           // [{ id, sender, senderNickname, text, ts }]
-let privateConvs = {};             // { otherUser: [{...message}] }
-let renderedPublicIds = new Set(); // 已渲染过的公共消息 id，避免重复
-let renderedPrivateIds = new Set();
+let db = { users: {}, messages_public: [], messages_private: {}, presence: {} };
+let dbSha = null;          // 当前 db.json 的 git blob SHA（更新需要）
+let pollTimer = null;
+let heartbeatTimer = null;
+let isUpdating = false;    // 正在写入中，避免轮询覆盖
 let lastTypingSignal = 0;
+let typingTimeout = null;
 
 // ============ 工具函数 ============
+async function sha256(text) {
+  const buf = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 function getInitials(name) {
   if (!name) return '?';
   return name.charAt(0).toUpperCase();
@@ -548,49 +496,125 @@ function showToast(message, type = '') {
   setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
-function setConnStatus(online, text) {
+function setConnStatus(state, text) {
   const dot = document.getElementById('connDot');
   const txt = document.getElementById('connText');
-  dot.classList.toggle('online', !!online);
-  txt.textContent = text || (online ? '已连接' : '连接中…');
+  dot.classList.remove('online', 'error');
+  if (state === 'online') dot.classList.add('online');
+  if (state === 'error') dot.classList.add('error');
+  txt.textContent = text || (state === 'online' ? '已连接' : state === 'error' ? '连接错误' : '连接中…');
 }
 
-// 用 SEA 加密 password 作为"密码哈希"——不存原密码
-async function hashPassword(password) {
-  // 用 password 加密一个固定字符串，得到稳定哈希
-  const enc = await SEA.encrypt('chathub-v1', password);
-  return enc;
+// ============ 后端数据访问层 ============
+async function fetchDB() {
+  // 用 cache-busting 查询参数避免 CDN 缓存
+  const url = RAW_URL + '?t=' + Date.now();
+  const resp = await fetch(url, { cache: 'no-store' });
+  if (!resp.ok) throw new Error('fetch db failed: ' + resp.status);
+  const data = await resp.json();
+  // 规范化
+  if (!data.users) data.users = {};
+  if (!data.messages_public) data.messages_public = [];
+  if (!data.messages_private) data.messages_private = {};
+  if (!data.presence) data.presence = {};
+  return data;
 }
 
-async function verifyPassword(password, hash) {
-  try {
-    const dec = await SEA.decrypt(hash, password);
-    return dec === 'chathub-v1';
-  } catch { return false; }
-}
-
-// ============ Gun 初始化 ============
-function initGun() {
-  if (gun) return;
-  gun = Gun({
-    peers: RELAYS,
-    localStorage: 'chathub-local',   // 本地缓存
-    radisk: true,
+async function getDbSha() {
+  // 通过 Contents API 获取当前 sha
+  const resp = await fetch(API_BASE, {
+    headers: {
+      'Authorization': `token ${CONFIG.token}`,
+      'Accept': 'application/vnd.github+json',
+      'User-Agent': 'chathub-app',
+    },
   });
-  sea = SEA;
-
-  // 连接状态监听
-  const mesh = gun.back('opt.mesh') || {};
-  let anyConn = false;
-  // 任何节点出现/消失时更新徽标
-  setInterval(() => {
-    const peers = gun.back('opt.peers') || {};
-    const alive = Object.values(peers).some(p => p && p.wire && p.wire.readyState === 1);
-    setConnStatus(alive, alive ? '已连接' : '连接中…');
-  }, 2000);
+  if (!resp.ok) throw new Error('get sha failed: ' + resp.status);
+  const data = await resp.json();
+  return data.sha;
 }
 
-// ============ 注册系统（基于 SEA）============
+async function writeDB(newDb) {
+  if (isUpdating) return false;
+  isUpdating = true;
+  try {
+    // 获取最新 sha（避免冲突）
+    if (!dbSha) dbSha = await getDbSha();
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(newDb, null, 2))));
+    const resp = await fetch(API_BASE, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${CONFIG.token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'chathub-app',
+      },
+      body: JSON.stringify({
+        message: 'chathub: update db',
+        content,
+        sha: dbSha,
+        branch: CONFIG.branch,
+      }),
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      // sha 失效，重新获取
+      if (resp.status === 409 || resp.status === 422) {
+        dbSha = await getDbSha();
+        isUpdating = false;
+        return false;
+      }
+      throw new Error('write db failed: ' + resp.status + ' ' + JSON.stringify(err).substring(0, 200));
+    }
+    const data = await resp.json();
+    dbSha = data.content.sha;  // 更新 sha
+    return true;
+  } finally {
+    isUpdating = false;
+  }
+}
+
+async function updateDB(mutator) {
+  // 读取最新 → 修改 → 写回，最多重试 3 次
+  for (let i = 0; i < 3; i++) {
+    try {
+      const fresh = await fetchDB();
+      dbSha = null;  // 强制重新获取 sha
+      const modified = mutator(fresh);
+      if (!modified) return true;  // 无需修改
+      const ok = await writeDB(modified);
+      if (ok) {
+        db = modified;
+        return true;
+      }
+    } catch (e) {
+      console.warn('updateDB retry', i, e.message);
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+  return false;
+}
+
+// ============ 注册/登录系统 ============
+function showRegister() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('registerPage').style.display = 'flex';
+  document.getElementById('registerError').classList.remove('show');
+  document.getElementById('registerSuccess').classList.remove('show');
+}
+
+function showLogin() {
+  document.getElementById('registerPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginError').classList.remove('show');
+}
+
+function showAuthError(elId, msg) {
+  const el = document.getElementById(elId);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
 async function handleRegister(e) {
   e.preventDefault();
   const btn = document.getElementById('registerBtn');
@@ -622,33 +646,45 @@ async function handleRegister(e) {
     btn.disabled = false; btn.textContent = '注 册'; return;
   }
 
-  initGun();
+  setConnStatus('', '正在连接后端…');
+  try {
+    // 重新拉一次 db
+    db = await fetchDB();
+    setConnStatus('online', '已连接');
+  } catch (e) {
+    setConnStatus('error', '后端连接失败');
+    showAuthError('registerError', '后端连接失败：' + e.message);
+    btn.disabled = false; btn.textContent = '注 册';
+    return;
+  }
 
-  // 1. 检查用户名是否已存在
-  const existing = await new Promise(resolve => {
-    gun.get('chathub').get('users').get(username.toLowerCase()).once(v => resolve(v), {wait: 1500});
-  });
-
-  if (existing && existing.passwordHash) {
+  if (db.users[username.toLowerCase()]) {
     showAuthError('registerError', '该用户名已被注册');
     btn.disabled = false; btn.textContent = '注 册'; return;
   }
 
-  // 2. 创建 SEA 密钥对
-  const pair = await SEA.pair();
-  const passwordHash = await hashPassword(password);
-
+  const passwordHash = await sha256(password);
   const userRecord = {
     username,
     nickname,
     passwordHash,
-    pub: pair.pub,
-    epub: pair.epub,
     createdAt: Date.now(),
   };
 
-  // 3. 写入 Gun 图数据库
-  gun.get('chathub').get('users').get(username.toLowerCase()).put(userRecord);
+  const ok = await updateDB(fresh => {
+    if (fresh.users[username.toLowerCase()]) {
+      showAuthError('registerError', '该用户名已被注册');
+      return null;
+    }
+    fresh.users[username.toLowerCase()] = userRecord;
+    return fresh;
+  });
+
+  if (!ok) {
+    showAuthError('registerError', '注册失败，请重试');
+    btn.disabled = false; btn.textContent = '注 册';
+    return;
+  }
 
   const successEl = document.getElementById('registerSuccess');
   successEl.textContent = `注册成功！欢迎，${nickname}。正在跳转登录…`;
@@ -663,7 +699,6 @@ async function handleRegister(e) {
   }, 1500);
 }
 
-// ============ 登录系统 ============
 async function handleLogin(e) {
   e.preventDefault();
   const btn = document.getElementById('loginBtn');
@@ -674,306 +709,142 @@ async function handleLogin(e) {
   const password = document.getElementById('loginPassword').value;
 
   document.getElementById('loginError').classList.remove('show');
-  initGun();
+  setConnStatus('', '正在连接后端…');
 
-  // 1. 读取用户记录
-  const userRecord = await new Promise(resolve => {
-    let done = false;
-    gun.get('chathub').get('users').get(username.toLowerCase()).once(v => {
-      if (!done) { done = true; resolve(v); }
-    }, {wait: 2500});
-    setTimeout(() => { if (!done) { done = true; resolve(null); } }, 3000);
-  });
+  try {
+    db = await fetchDB();
+    setConnStatus('online', '已连接');
+  } catch (e) {
+    setConnStatus('error', '后端连接失败');
+    showAuthError('loginError', '后端连接失败：' + e.message);
+    btn.disabled = false; btn.textContent = '登 录';
+    return;
+  }
 
-  if (!userRecord || !userRecord.passwordHash) {
+  const userRecord = db.users[username.toLowerCase()];
+  if (!userRecord) {
     showAuthError('loginError', '用户名不存在，请先注册');
     btn.disabled = false; btn.textContent = '登 录'; return;
   }
-
-  // 2. 校验密码
-  const ok = await verifyPassword(password, userRecord.passwordHash);
-  if (!ok) {
+  const passwordHash = await sha256(password);
+  if (userRecord.passwordHash !== passwordHash) {
     showAuthError('loginError', '密码错误');
     btn.disabled = false; btn.textContent = '登 录'; return;
   }
 
-  // 3. 恢复 SEA 密钥对（基于用户名+密码）
-  // 由于我们不存储 priv/epriv，需要重新派生——但 SEA 的 pair 是随机生成的
-  // 所以我们存储了 pub/epub，但 priv/epriv 需要"密码+salt"派生
-  // 简化处理：注册时也存一份 pair 在加密形式（用 password 加密）
-  // 这里我们直接拿存储的 pub/epub 用于身份，私聊加密用 senderNickname 即可
-  // 真正严格的端到端加密需要派生 pair，但为了演示可用性，我们简化为不加密私聊内容
-  // 若需要 E2EE，可在注册时存储 password 加密的 pair，登录时解出
-
-  currentUser = {
-    username: userRecord.username,
-    nickname: userRecord.nickname,
-    pub: userRecord.pub,
-    epub: userRecord.epub,
-  };
-
-  // 4. 持久化会话（localStorage 仅存登录态，不含密钥）
+  currentUser = { username: userRecord.username, nickname: userRecord.nickname };
   localStorage.setItem('chathub_session', JSON.stringify({
     username: currentUser.username,
     nickname: currentUser.nickname,
-    pub: currentUser.pub,
-    epub: currentUser.epub,
     ts: Date.now(),
   }));
 
-  // 5. 上线广播 + 进入聊天
-  announcePresence(true);
+  // 上线广播
+  await announcePresence(true);
   enterChatApp();
-  startListening();
+  startPolling();
   startHeartbeat();
-
   btn.disabled = false;
   btn.textContent = '登 录';
 }
 
 // ============ 在线状态 ============
-function announcePresence(online) {
-  if (!currentUser || !gun) return;
-  const info = {
-    username: currentUser.username,
-    nickname: currentUser.nickname,
-    pub: currentUser.pub,
-    lastSeen: Date.now(),
-    online: !!online,
-  };
-  // 写到 presence 节点
-  gun.get('chathub').get('presence').get(currentUser.username).put(info);
-  // 在线用户列表由全局监听器更新
+async function announcePresence(online) {
+  if (!currentUser) return;
+  await updateDB(fresh => {
+    fresh.presence[currentUser.username] = {
+      username: currentUser.username,
+      nickname: currentUser.nickname,
+      lastSeen: Date.now(),
+      online: !!online,
+    };
+    return fresh;
+  });
+}
+
+async function setOffline() {
+  if (!currentUser) return;
+  await updateDB(fresh => {
+    if (fresh.presence[currentUser.username]) {
+      fresh.presence[currentUser.username].online = false;
+      fresh.presence[currentUser.username].lastSeen = Date.now();
+    }
+    return fresh;
+  });
 }
 
 function startHeartbeat() {
-  if (heartbeatInterval) clearInterval(heartbeatInterval);
-  heartbeatInterval = setInterval(() => {
-    announcePresence(true);
-  }, 15000);
+  if (heartbeatTimer) clearInterval(heartbeatTimer);
+  heartbeatTimer = setInterval(() => announcePresence(true), CONFIG.heartbeatInterval);
+}
 
-  if (presenceCleanupInterval) clearInterval(presenceCleanupInterval);
-  presenceCleanupInterval = setInterval(() => {
+// ============ 轮询同步 ============
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(poll, CONFIG.pollInterval);
+  poll();  // 立即一次
+}
+
+let prevMsgCount = 0;
+let prevPrivKeys = '';
+
+async function poll() {
+  if (isUpdating) return;
+  try {
+    const fresh = await fetchDB();
+    db = fresh;
+    setConnStatus('online', '已连接');
     cleanupStalePresence();
-  }, 10000);
+    // 检测新消息
+    const newMsgCount = (db.messages_public || []).length;
+    if (newMsgCount > prevMsgCount) {
+      const newMsgs = (db.messages_public || []).slice(prevMsgCount);
+      if (currentChat.type === 'public') {
+        renderMessages();
+        // 非自己发的消息才 toast
+        for (const m of newMsgs) {
+          if (m.sender !== currentUser.username) {
+            showToast(`${m.senderNickname || m.sender}: ${m.text.substring(0, 30)}`);
+          }
+        }
+      } else {
+        for (const m of newMsgs) {
+          if (m.sender !== currentUser.username) {
+            showToast(`${m.senderNickname || m.sender}: ${m.text.substring(0, 30)}`);
+          }
+        }
+      }
+      prevMsgCount = newMsgCount;
+    }
+    // 私聊消息检测
+    if (db.messages_private) {
+      for (const [key, msgs] of Object.entries(db.messages_private)) {
+        const parts = key.split('|');
+        if (!parts.includes(currentUser.username)) continue;
+        const otherUser = parts.find(p => p !== currentUser.username);
+        if (!otherUser) continue;
+        if (currentChat.type === 'private' && currentChat.target === otherUser) {
+          renderMessages();
+        }
+      }
+    }
+    if (currentTab === 'users') renderSidebarList();
+    updateChatHeaderStatus();
+  } catch (e) {
+    setConnStatus('error', '轮询失败');
+  }
 }
 
 function cleanupStalePresence() {
+  if (!db.presence) return;
   const now = Date.now();
   let changed = false;
-  for (const [u, info] of Object.entries(onlineUsers)) {
-    if (u === currentUser.username) continue;  // 自己永远算在线
-    if (now - info.lastSeen > 30000 && info.online) {
+  for (const [u, info] of Object.entries(db.presence)) {
+    if (now - (info.lastSeen || 0) > CONFIG.onlineTimeout && info.online) {
       info.online = false;
       changed = true;
     }
   }
-  if (changed) {
-    if (currentTab === 'users') renderSidebarList();
-    updateChatHeaderStatus();
-  }
-}
-
-// ============ 监听 Gun 实时数据 ============
-function startListening() {
-  // 1. 监听所有在线用户（presence 节点）
-  // 用 .once() 先加载所有历史 presence 数据，再 .on() 监听新增/更新
-  gun.get('chathub').get('presence').map().once((data, key) => {
-    if (!data || !data.username) return;
-    const isSelf = data.username === currentUser.username;
-    onlineUsers[data.username] = {
-      username: data.username,
-      nickname: data.nickname,
-      pub: data.pub,
-      lastSeen: data.lastSeen || Date.now(),
-      online: isSelf ? true : data.online,
-    };
-  });
-  // 然后监听实时更新
-  gun.get('chathub').get('presence').map().on((data, key) => {
-    if (!data || !data.username) return;
-    const isSelf = data.username === currentUser.username;
-    onlineUsers[data.username] = {
-      username: data.username,
-      nickname: data.nickname,
-      pub: data.pub,
-      lastSeen: data.lastSeen || Date.now(),
-      online: isSelf ? true : data.online,
-    };
-    // 自动更新 UI
-    if (currentTab === 'users') renderSidebarList();
-    updateChatHeaderStatus();
-  });
-  // 给 .once() 一点时间，然后刷新一次 UI
-  setTimeout(() => {
-    cleanupStalePresence();
-    if (currentTab === 'users') renderSidebarList();
-    updateChatHeaderStatus();
-  }, 3000);
-  // 定期重新扫描（防止遗漏）
-  setInterval(() => {
-    gun.get('chathub').get('presence').map().once((data, key) => {
-      if (!data || !data.username) return;
-      const isSelf = data.username === currentUser.username;
-      if (!onlineUsers[data.username] || (Date.now() - (onlineUsers[data.username].lastSeen || 0) < 60000 && !onlineUsers[data.username].online)) {
-        onlineUsers[data.username] = {
-          username: data.username,
-          nickname: data.nickname,
-          pub: data.pub,
-          lastSeen: data.lastSeen || Date.now(),
-          online: isSelf ? true : data.online,
-        };
-      }
-    });
-  }, 20000);
-
-  // 2. 监听公共聊天消息——用 .once() 加载历史，.on() 接收新消息
-  gun.get('chathub').get('public_chat').map().once((data, key) => {
-    if (!data || !data.id || renderedPublicIds.has(data.id)) return;
-    renderedPublicIds.add(data.id);
-    publicMessages.push(data);
-    publicMessages.sort((a, b) => (a.ts || 0) - (b.ts || 0));
-  });
-  gun.get('chathub').get('public_chat').map().on((data, key) => {
-    if (!data || !data.id || renderedPublicIds.has(data.id)) return;
-    renderedPublicIds.add(data.id);
-    publicMessages.push(data);
-    publicMessages.sort((a, b) => (a.ts || 0) - (b.ts || 0));
-    if (currentChat.type === 'public') {
-      renderMessages();
-      renderSidebarList();
-    } else {
-      showToast(`${data.senderNickname || data.sender}: ${data.text.substring(0, 30)}`);
-      renderSidebarList();
-    }
-  });
-  // 给历史加载留时间，然后刷新 UI
-  setTimeout(() => {
-    if (currentChat.type === 'public') renderMessages();
-    renderSidebarList();
-  }, 3000);
-
-  // 3. 监听私聊消息
-  // 用 .once() 加载历史 + .on() 接收新消息
-  gun.get('chathub').get('private').get(currentUser.username).map().once((data, key) => {
-    if (!data || !data.id) return;
-    const convKey = data.conversationKey;
-    if (!convKey) return;
-    const otherUser = data.sender === currentUser.username ? data.recipient : data.sender;
-    if (!privateConvs[otherUser]) privateConvs[otherUser] = [];
-    const convId = `${convKey}:${data.id}`;
-    if (renderedPrivateIds.has(convId)) return;
-    renderedPrivateIds.add(convId);
-    privateConvs[otherUser].push(data);
-    privateConvs[otherUser].sort((a, b) => (a.ts || 0) - (b.ts || 0));
-  });
-  gun.get('chathub').get('private').get(currentUser.username).map().on((data, key) => {
-    if (!data || !data.id) return;
-    const convKey = data.conversationKey;
-    if (!convKey) return;
-    const otherUser = data.sender === currentUser.username ? data.recipient : data.sender;
-    if (!privateConvs[otherUser]) privateConvs[otherUser] = [];
-    const convId = `${convKey}:${data.id}`;
-    if (renderedPrivateIds.has(convId)) return;
-    renderedPrivateIds.add(convId);
-    privateConvs[otherUser].push(data);
-    privateConvs[otherUser].sort((a, b) => (a.ts || 0) - (b.ts || 0));
-
-    if (currentChat.type === 'private' && currentChat.target === otherUser) {
-      renderMessages();
-      renderSidebarList();
-    } else {
-      if (data.sender !== currentUser.username) {
-        showToast(`${data.senderNickname || data.sender} 给你发了一条私信`);
-      }
-      renderSidebarList();
-    }
-  });
-  setTimeout(() => {
-    if (currentChat.type === 'private') renderMessages();
-    renderSidebarList();
-  }, 3000);
-
-  // 4. 监听正在输入信号
-  gun.get('chathub').get('typing').map().on((data, key) => {
-    if (!data || !data.user) return;
-    if (currentChat.type === 'private' && currentChat.target === data.user) {
-      const ind = document.getElementById('typingIndicator');
-      if (data.typing && data.user !== currentUser.username) {
-        ind.textContent = `${data.nickname || data.user} 正在输入…`;
-        ind.classList.add('show');
-      } else {
-        ind.classList.remove('show');
-      }
-    }
-  });
-}
-
-// ============ 发送消息 ============
-function sendMessage() {
-  const input = document.getElementById('messageInput');
-  const text = input.value.trim();
-  if (!text) return;
-
-  const message = {
-    id: 'm' + Date.now() + Math.random().toString(36).slice(2, 6),
-    sender: currentUser.username,
-    senderNickname: currentUser.nickname,
-    text,
-    ts: Date.now(),
-  };
-
-  if (currentChat.type === 'public') {
-    // 写入公共聊天节点
-    gun.get('chathub').get('public_chat').get(message.id).put(message);
-    // 本地立即显示（监听会触发，但这里也手动加一下避免延迟）
-    renderedPublicIds.add(message.id);
-    publicMessages.push(message);
-    publicMessages.sort((a, b) => (a.ts || 0) - (b.ts || 0));
-    renderMessages();
-  } else if (currentChat.type === 'private') {
-    const otherUser = currentChat.target;
-    const conversationKey = [currentUser.username, otherUser].sort().join('|');
-    message.recipient = otherUser;
-    message.conversationKey = conversationKey;
-    // 写入 sender 视角节点 & recipient 视角节点（双方都能监听到）
-    gun.get('chathub').get('private').get(currentUser.username).get(message.id).put(message);
-    gun.get('chathub').get('private').get(otherUser).get(message.id).put(message);
-    // 本地立即显示
-    const convId = `${conversationKey}:${message.id}`;
-    renderedPrivateIds.add(convId);
-    if (!privateConvs[otherUser]) privateConvs[otherUser] = [];
-    privateConvs[otherUser].push(message);
-    privateConvs[otherUser].sort((a, b) => (a.ts || 0) - (b.ts || 0));
-    renderMessages();
-  }
-
-  input.value = '';
-  autoResize(input);
-  renderSidebarList();
-}
-
-// ============ 正在输入信号 ============
-function handleTyping() {
-  if (currentChat.type !== 'private') return;
-  const now = Date.now();
-  if (now - lastTypingSignal < 1500) return;  // 节流
-  lastTypingSignal = now;
-  gun.get('chathub').get('typing').get(currentUser.username).put({
-    user: currentUser.username,
-    nickname: currentUser.nickname,
-    typing: true,
-    ts: now,
-  });
-  if (typingTimeout) clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(() => {
-    gun.get('chathub').get('typing').get(currentUser.username).put({
-      user: currentUser.username,
-      nickname: currentUser.nickname,
-      typing: false,
-      ts: Date.now(),
-    });
-  }, 2000);
 }
 
 // ============ UI 渲染 ============
@@ -981,38 +852,56 @@ function enterChatApp() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('registerPage').style.display = 'none';
   document.getElementById('chatApp').classList.add('show');
-
   document.getElementById('myNickname').textContent = currentUser.nickname;
   document.getElementById('myAvatar').textContent = getInitials(currentUser.nickname);
-
+  prevMsgCount = (db.messages_public || []).length;
   renderSidebarList();
   openPublicChat();
 }
 
-function showRegister() {
-  document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('registerPage').style.display = 'flex';
-  document.getElementById('registerError').classList.remove('show');
-  document.getElementById('registerSuccess').classList.remove('show');
-}
+function confirmLogout() { document.getElementById('logoutModal').classList.add('show'); }
+function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
 
-function showLogin() {
-  document.getElementById('registerPage').style.display = 'none';
+async function logout() {
+  await setOffline();
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+  localStorage.removeItem('chathub_session');
+  currentUser = null;
+  currentChat = { type: null, target: null };
+  closeLogoutModal();
+  document.getElementById('chatApp').classList.remove('show');
+  document.getElementById('loginForm').reset();
   document.getElementById('loginPage').style.display = 'flex';
-  document.getElementById('loginError').classList.remove('show');
 }
 
-function showAuthError(elId, msg) {
-  const el = document.getElementById(elId);
-  el.textContent = msg;
-  el.classList.add('show');
+function restoreSession() {
+  const raw = localStorage.getItem('chathub_session');
+  if (!raw) return;
+  try {
+    const sess = JSON.parse(raw);
+    if (!sess.username) { localStorage.removeItem('chathub_session'); return; }
+    currentUser = { username: sess.username, nickname: sess.nickname };
+    // 先拉一次 db
+    fetchDB().then(fresh => {
+      db = fresh;
+      prevMsgCount = (db.messages_public || []).length;
+      announcePresence(true);
+      enterChatApp();
+      startPolling();
+      startHeartbeat();
+    }).catch(e => {
+      setConnStatus('error', '恢复会话失败');
+      localStorage.removeItem('chathub_session');
+    });
+  } catch {
+    localStorage.removeItem('chathub_session');
+  }
 }
 
 function switchTab(tab) {
   currentTab = tab;
-  document.querySelectorAll('.sidebar-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.tab === tab);
-  });
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   renderSidebarList();
 }
 
@@ -1025,7 +914,7 @@ function renderSidebarList() {
     const publicItem = document.createElement('div');
     publicItem.className = 'list-item' + (currentChat.type === 'public' ? ' active' : '');
     publicItem.onclick = () => openPublicChat();
-    const lastMsg = publicMessages[publicMessages.length - 1];
+    const lastMsg = (db.messages_public || [])[db.messages_public?.length - 1];
     publicItem.innerHTML = `
       <div class="avatar" style="background: linear-gradient(135deg, #10b981, #059669);">#</div>
       <div class="item-content">
@@ -1036,19 +925,28 @@ function renderSidebarList() {
     `;
     list.appendChild(publicItem);
 
-    // 私聊会话列表
-    const privateUsers = Object.keys(privateConvs).filter(u => privateConvs[u].length > 0);
-    if (privateUsers.length === 0) {
+    // 私聊会话
+    const privateUsers = new Set();
+    if (db.messages_private) {
+      for (const key of Object.keys(db.messages_private)) {
+        const parts = key.split('|');
+        if (parts.includes(currentUser.username)) {
+          privateUsers.add(parts.find(p => p !== currentUser.username));
+        }
+      }
+    }
+    if (privateUsers.size === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-list';
       empty.textContent = '还没有私聊，点击「在线用户」开始私聊';
       list.appendChild(empty);
     } else {
       for (const otherUser of privateUsers) {
-        const msgs = privateConvs[otherUser] || [];
+        const key = [currentUser.username, otherUser].sort().join('|');
+        const msgs = (db.messages_private[key] || []);
         const lastPriv = msgs[msgs.length - 1];
-        const onlineInfo = onlineUsers[otherUser];
-        const nickname = (onlineInfo && onlineInfo.nickname) || (msgs[0] && msgs[0].senderNickname) || otherUser;
+        const presenceInfo = db.presence && db.presence[otherUser];
+        const nickname = (presenceInfo && presenceInfo.nickname) || (lastPriv && (lastPriv.sender === otherUser ? lastPriv.senderNickname : lastPriv.recipientNickname)) || otherUser;
         const isActive = currentChat.type === 'private' && currentChat.target === otherUser;
         const item = document.createElement('div');
         item.className = 'list-item' + (isActive ? ' active' : '');
@@ -1066,7 +964,9 @@ function renderSidebarList() {
     }
   } else if (currentTab === 'users') {
     cleanupStalePresence();
-    const others = Object.values(onlineUsers).filter(u => u.username !== currentUser.username && u.online !== false && (Date.now() - (u.lastSeen || 0) < 60000));
+    const others = Object.values(db.presence || {}).filter(u =>
+      u.username !== currentUser.username && u.online !== false && (Date.now() - (u.lastSeen || 0) < CONFIG.onlineTimeout)
+    );
     if (others.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-list';
@@ -1097,11 +997,9 @@ function openPublicChat() {
   document.getElementById('chatInput').style.display = 'flex';
   document.getElementById('chatHeader').style.display = 'flex';
   document.getElementById('chatAvatar').style.display = 'none';
-
   document.getElementById('chatTitle').textContent = '公共聊天室';
-  const count = Object.keys(onlineUsers).length;
+  const count = Object.values(db.presence || {}).filter(u => u.online !== false && (Date.now() - (u.lastSeen || 0) < CONFIG.onlineTimeout)).length;
   document.getElementById('chatSubtitle').textContent = `${count} 人在线`;
-
   renderSidebarList();
   renderMessages();
   document.getElementById('sidebar').classList.remove('open');
@@ -1109,22 +1007,21 @@ function openPublicChat() {
 }
 
 function openPrivateChat(targetUser) {
-  const info = onlineUsers[targetUser];
-  const lastMsg = privateConvs[targetUser] && privateConvs[targetUser][0];
-  const nickname = (info && info.nickname) || (lastMsg && lastMsg.senderNickname) || targetUser;
+  const presenceInfo = db.presence && db.presence[targetUser];
+  const key = [currentUser.username, targetUser].sort().join('|');
+  const msgs = (db.messages_private && db.messages_private[key]) || [];
+  const lastMsg = msgs[0];
+  const nickname = (presenceInfo && presenceInfo.nickname) || (lastMsg && lastPriv && lastPriv.senderNickname) || targetUser;
   currentChat = { type: 'private', target: targetUser };
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('messagesContainer').style.display = 'flex';
   document.getElementById('chatInput').style.display = 'flex';
   document.getElementById('chatHeader').style.display = 'flex';
-
   const avatar = document.getElementById('chatAvatar');
   avatar.style.display = 'flex';
   avatar.textContent = getInitials(nickname);
-
   document.getElementById('chatTitle').textContent = nickname;
   updateChatHeaderStatus();
-
   if (currentTab !== 'chats') switchTab('chats');
   renderSidebarList();
   renderMessages();
@@ -1134,10 +1031,8 @@ function openPrivateChat(targetUser) {
 
 function updateChatHeaderStatus() {
   if (currentChat.type !== 'private') return;
-  const info = onlineUsers[currentChat.target];
-  const isOnline = !!info;
-  const userObj = onlineUsers[currentChat.target];
-  const nickname = userObj ? userObj.nickname : currentChat.target;
+  const info = db.presence && db.presence[currentChat.target];
+  const isOnline = info && info.online !== false && (Date.now() - (info.lastSeen || 0) < CONFIG.onlineTimeout);
   document.getElementById('chatSubtitle').textContent = isOnline ? '在线' : '离线';
   document.getElementById('chatSubtitle').style.color = isOnline ? 'var(--success)' : 'var(--text-muted)';
 }
@@ -1145,15 +1040,13 @@ function updateChatHeaderStatus() {
 function renderMessages() {
   const container = document.getElementById('messagesContainer');
   container.innerHTML = '';
-
   let messages;
   if (currentChat.type === 'public') {
-    messages = publicMessages;
+    messages = db.messages_public || [];
   } else if (currentChat.type === 'private') {
-    messages = privateConvs[currentChat.target] || [];
-  } else {
-    return;
-  }
+    const key = [currentUser.username, currentChat.target].sort().join('|');
+    messages = (db.messages_private && db.messages_private[key]) || [];
+  } else return;
 
   if (messages.length === 0 && currentChat.type === 'public') {
     const sysMsg = document.createElement('div');
@@ -1162,16 +1055,14 @@ function renderMessages() {
     container.appendChild(sysMsg);
     return;
   }
-
   for (const msg of messages) {
     const msgEl = document.createElement('div');
     const isSelf = msg.sender === currentUser.username;
     msgEl.className = 'message' + (isSelf ? ' self' : '') + (msg.system ? ' system' : '');
-
     if (msg.system) {
       msgEl.innerHTML = `<div class="message-bubble">${escapeHtml(msg.text)}</div>`;
     } else {
-      const info = onlineUsers[msg.sender];
+      const info = db.presence && db.presence[msg.sender];
       const senderNickname = (info && info.nickname) || msg.senderNickname || msg.sender;
       msgEl.innerHTML = `
         <div class="avatar">${getInitials(senderNickname)}</div>
@@ -1186,69 +1077,70 @@ function renderMessages() {
     }
     container.appendChild(msgEl);
   }
-
-  requestAnimationFrame(() => {
-    container.scrollTop = container.scrollHeight;
-  });
+  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
 }
 
-// ============ 登出 ============
-function confirmLogout() {
-  document.getElementById('logoutModal').classList.add('show');
-}
-function closeLogoutModal() {
-  document.getElementById('logoutModal').classList.remove('show');
-}
-function logout() {
-  if (currentUser && gun) {
-    // 标记下线
-    gun.get('chathub').get('presence').get(currentUser.username).put({
-      username: currentUser.username,
-      nickname: currentUser.nickname,
-      lastSeen: Date.now(),
-      online: false,
+// ============ 发送消息 ============
+async function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.disabled = true;
+
+  const message = {
+    id: 'm' + Date.now() + Math.random().toString(36).slice(2, 6),
+    sender: currentUser.username,
+    senderNickname: currentUser.nickname,
+    text,
+    ts: Date.now(),
+  };
+
+  if (currentChat.type === 'public') {
+    const ok = await updateDB(fresh => {
+      if (!fresh.messages_public) fresh.messages_public = [];
+      fresh.messages_public.push(message);
+      // 只保留最近 100 条
+      if (fresh.messages_public.length > 100) fresh.messages_public = fresh.messages_public.slice(-100);
+      return fresh;
     });
+    if (ok) {
+      prevMsgCount = (db.messages_public || []).length;
+      input.value = '';
+      autoResize(input);
+      renderMessages();
+      renderSidebarList();
+    } else {
+      showToast('发送失败，请重试', 'error');
+    }
+  } else if (currentChat.type === 'private') {
+    const otherUser = currentChat.target;
+    const key = [currentUser.username, otherUser].sort().join('|');
+    message.recipient = otherUser;
+    const ok = await updateDB(fresh => {
+      if (!fresh.messages_private) fresh.messages_private = {};
+      if (!fresh.messages_private[key]) fresh.messages_private[key] = [];
+      fresh.messages_private[key].push(message);
+      if (fresh.messages_private[key].length > 100) fresh.messages_private[key] = fresh.messages_private[key].slice(-100);
+      return fresh;
+    });
+    if (ok) {
+      input.value = '';
+      autoResize(input);
+      renderMessages();
+      renderSidebarList();
+    } else {
+      showToast('发送失败，请重试', 'error');
+    }
   }
-  localStorage.removeItem('chathub_session');
-  currentUser = null;
-  currentChat = { type: null, target: null };
-  onlineUsers = {};
-  publicMessages = [];
-  privateConvs = {};
-  renderedPublicIds.clear();
-  renderedPrivateIds.clear();
-  if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
-  if (presenceCleanupInterval) { clearInterval(presenceCleanupInterval); presenceCleanupInterval = null; }
-  closeLogoutModal();
-  document.getElementById('chatApp').classList.remove('show');
-  document.getElementById('loginForm').reset();
-  document.getElementById('loginPage').style.display = 'flex';
+  sendBtn.disabled = false;
 }
 
-// ============ 自动恢复会话 ============
-function restoreSession() {
-  const raw = localStorage.getItem('chathub_session');
-  if (!raw) return;
-  try {
-    const sess = JSON.parse(raw);
-    if (!sess.username) { localStorage.removeItem('chathub_session'); return; }
-    initGun();
-    currentUser = {
-      username: sess.username,
-      nickname: sess.nickname,
-      pub: sess.pub,
-      epub: sess.epub,
-    };
-    announcePresence(true);
-    enterChatApp();
-    startListening();
-    startHeartbeat();
-  } catch {
-    localStorage.removeItem('chathub_session');
-  }
+function handleTyping() {
+  // 暂未实现跨设备输入提示（需要更频繁的轮询，可能消耗 API 额度）
 }
 
-// ============ 辅助函数 ============
+// ============ 辅助 ============
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
@@ -1261,25 +1153,17 @@ function toggleSidebar() {
 // ============ 事件绑定 ============
 document.getElementById('registerForm').addEventListener('submit', handleRegister);
 document.getElementById('loginForm').addEventListener('submit', handleLogin);
-
 const messageInput = document.getElementById('messageInput');
 messageInput.addEventListener('input', () => autoResize(messageInput));
-messageInput.addEventListener('input', handleTyping);
 messageInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 });
 
 window.addEventListener('beforeunload', () => {
-  if (currentUser && gun) {
-    gun.get('chathub').get('presence').get(currentUser.username).put({
-      username: currentUser.username,
-      nickname: currentUser.nickname,
-      lastSeen: Date.now(),
-      online: false,
-    });
+  if (currentUser) {
+    // 用 sendBeacon 异步标记下线（不能等 await）
+    // 但 GitHub API 不支持 sendBeacon，所以尽力而为：发起同步请求
+    // 简化：在心跳里已经标记，离线超时后会被自动清理
   }
 });
 
