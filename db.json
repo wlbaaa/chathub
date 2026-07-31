@@ -3,10 +3,10 @@
   "messages_public": [],
   "messages_private": {},
   "presence": {
-    "wlb1": {
-      "username": "wlb1",
-      "nickname": "wlb1",
-      "lastSeen": 1785502022537,
+    "wlb": {
+      "username": "wlb",
+      "nickname": "wlb",
+      "lastSeen": 1785502031874,
       "online": true
     }
   },
