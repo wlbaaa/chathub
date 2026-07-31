@@ -1,20 +1,18 @@
 {
   "users": {},
-  "messages_public": [
-    {
-      "id": "m1785502811988p62u",
-      "sender": "wlb",
-      "senderNickname": "wlb",
-      "text": "1111",
-      "ts": 1785502811988
-    }
-  ],
+  "messages_public": [],
   "messages_private": {},
   "presence": {
     "wlb1": {
       "username": "wlb1",
       "nickname": "wlb1",
       "lastSeen": 1785502213822,
+      "online": true
+    },
+    "wlb": {
+      "username": "wlb",
+      "nickname": "wlb",
+      "lastSeen": 1785502824308,
       "online": true
     }
   },
