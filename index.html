@@ -526,7 +526,6 @@ async function getDbSha() {
     headers: {
       'Authorization': `token ${CONFIG.token}`,
       'Accept': 'application/vnd.github+json',
-      'User-Agent': 'chathub-app',
     },
   });
   if (!resp.ok) throw new Error('get sha failed: ' + resp.status);
@@ -547,7 +546,6 @@ async function writeDB(newDb) {
         'Authorization': `token ${CONFIG.token}`,
         'Accept': 'application/vnd.github+json',
         'Content-Type': 'application/json',
-        'User-Agent': 'chathub-app',
       },
       body: JSON.stringify({
         message: 'chathub: update db',
@@ -576,23 +574,27 @@ async function writeDB(newDb) {
 
 async function updateDB(mutator) {
   // 读取最新 → 修改 → 写回，最多重试 3 次
+  let lastErr = null;
   for (let i = 0; i < 3; i++) {
     try {
       const fresh = await fetchDB();
       dbSha = null;  // 强制重新获取 sha
       const modified = mutator(fresh);
-      if (!modified) return true;  // 无需修改
+      if (!modified) return { ok: true };  // 无需修改
       const ok = await writeDB(modified);
       if (ok) {
         db = modified;
-        return true;
+        return { ok: true };
       }
+      // 写入失败（sha 冲突等），重试
+      lastErr = 'sha conflict';
     } catch (e) {
       console.warn('updateDB retry', i, e.message);
+      lastErr = e.message;
       await new Promise(r => setTimeout(r, 500));
     }
   }
-  return false;
+  return { ok: false, error: lastErr };
 }
 
 // ============ 注册/登录系统 ============
@@ -671,7 +673,7 @@ async function handleRegister(e) {
     createdAt: Date.now(),
   };
 
-  const ok = await updateDB(fresh => {
+  const result = await updateDB(fresh => {
     if (fresh.users[username.toLowerCase()]) {
       showAuthError('registerError', '该用户名已被注册');
       return null;
@@ -680,8 +682,8 @@ async function handleRegister(e) {
     return fresh;
   });
 
-  if (!ok) {
-    showAuthError('registerError', '注册失败，请重试');
+  if (!result.ok) {
+    showAuthError('registerError', '注册失败：' + (result.error || '未知错误'));
     btn.disabled = false; btn.textContent = '注 册';
     return;
   }
@@ -1097,40 +1099,40 @@ async function sendMessage() {
   };
 
   if (currentChat.type === 'public') {
-    const ok = await updateDB(fresh => {
+    const result = await updateDB(fresh => {
       if (!fresh.messages_public) fresh.messages_public = [];
       fresh.messages_public.push(message);
       // 只保留最近 100 条
       if (fresh.messages_public.length > 100) fresh.messages_public = fresh.messages_public.slice(-100);
       return fresh;
     });
-    if (ok) {
+    if (result.ok) {
       prevMsgCount = (db.messages_public || []).length;
       input.value = '';
       autoResize(input);
       renderMessages();
       renderSidebarList();
     } else {
-      showToast('发送失败，请重试', 'error');
+      showToast('发送失败：' + (result.error || '未知错误'), 'error');
     }
   } else if (currentChat.type === 'private') {
     const otherUser = currentChat.target;
     const key = [currentUser.username, otherUser].sort().join('|');
     message.recipient = otherUser;
-    const ok = await updateDB(fresh => {
+    const result = await updateDB(fresh => {
       if (!fresh.messages_private) fresh.messages_private = {};
       if (!fresh.messages_private[key]) fresh.messages_private[key] = [];
       fresh.messages_private[key].push(message);
       if (fresh.messages_private[key].length > 100) fresh.messages_private[key] = fresh.messages_private[key].slice(-100);
       return fresh;
     });
-    if (ok) {
+    if (result.ok) {
       input.value = '';
       autoResize(input);
       renderMessages();
       renderSidebarList();
     } else {
-      showToast('发送失败，请重试', 'error');
+      showToast('发送失败：' + (result.error || '未知错误'), 'error');
     }
   }
   sendBtn.disabled = false;
