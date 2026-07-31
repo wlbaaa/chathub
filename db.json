@@ -1,16 +1,15 @@
 {
   "users": {},
-  "messages_public": [
-    {
-      "id": "m1785502042838xsqz",
-      "sender": "wlb",
-      "senderNickname": "wlb",
-      "text": "2//",
-      "ts": 1785502042838
-    }
-  ],
+  "messages_public": [],
   "messages_private": {},
-  "presence": {},
+  "presence": {
+    "wlb": {
+      "username": "wlb",
+      "nickname": "wlb",
+      "lastSeen": 1785502046896,
+      "online": true
+    }
+  },
   "meta": {
     "created": "2026-07-31",
     "version": 3,
