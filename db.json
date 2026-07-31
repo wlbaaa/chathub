@@ -1,18 +1,20 @@
 {
   "users": {},
-  "messages_public": [],
+  "messages_public": [
+    {
+      "id": "m1785502123645ja14",
+      "sender": "wlb",
+      "senderNickname": "wlb",
+      "text": "自己实际上就是",
+      "ts": 1785502123646
+    }
+  ],
   "messages_private": {},
   "presence": {
     "wlb1": {
       "username": "wlb1",
       "nickname": "wlb1",
       "lastSeen": 1785502107825,
-      "online": true
-    },
-    "wlb": {
-      "username": "wlb",
-      "nickname": "wlb",
-      "lastSeen": 1785502122790,
       "online": true
     }
   },
